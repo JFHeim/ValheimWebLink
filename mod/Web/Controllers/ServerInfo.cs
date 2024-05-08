@@ -9,7 +9,7 @@ public class ServerInfo : IController
 {
     public string Route => "/serverinfo";
     public string HttpMethod => "GET";
-    public string Description => "Returns general server info";
+    public string Description => "Returns vast server info";
 
     public void HandleRequest(HttpListenerRequest request, HttpListenerResponse response, bool isAuthed,
         Dictionary<string, string> queryParameters)
