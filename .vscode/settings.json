@@ -1,0 +1,5 @@
+{
+  "dotnet.defaultSolution": "ValheimOnlineMap.sln",
+  "dotnet.preferCSharpExtension": true
+  // "dotnet.preferCSharpExtension": true
+}
