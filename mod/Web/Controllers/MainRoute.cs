@@ -1,26 +1,18 @@
-﻿using System.IO;
-
-namespace ValheimWebLink.Web.Controllers;
+﻿namespace ValheimWebLink.Web.Controllers;
 
 [Controller]
 public class MainRoute : IController
 {
     public string Route => "/";
     public string HttpMethod => "GET";
-
     public string Description => "Returns all controllers info";
+    public List<QueryParamInfo> QueryParameters => [];
 
-    public void HandleRequest(HttpListenerRequest request, HttpListenerResponse response, bool isAuthed,
+    public Task HandleRequest(HttpListenerRequest request, HttpListenerResponse response, bool isAuthed,
         Dictionary<string, string> queryParameters)
     {
-        response.StatusCode = 200;
-        response.ContentType = "application/json";
-        response.ContentEncoding = Encoding.UTF8;
-        string responseString = JSON.ToJSON(new AllControllersInfo());
-        byte[] buffer = Encoding.UTF8.GetBytes(responseString);
-        response.ContentLength64 = buffer.Length;
-        using Stream output = response.OutputStream;
-        output.Write(buffer, 0, buffer.Length);
+        WebApiManager.SendResponce(response, OK, "application/json", new AllControllersInfo());
+        return Task.CompletedTask;
     }
 }
 
@@ -31,17 +23,19 @@ file struct AllControllersInfo()
 }
 
 [Serializable]
-file struct ControllerInfo
+file struct ControllerInfo()
 {
     public string route;
     public string httpMethod;
     public string description;
+    public List<QueryParamInfo> queryParameters = [];
 
     public static ControllerInfo FromIController(IController controller) =>
         new()
         {
             route = controller.Route,
             httpMethod = controller.HttpMethod,
-            description = controller.Description
+            description = controller.Description,
+            queryParameters = controller.QueryParameters
         };
 }

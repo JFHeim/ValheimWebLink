@@ -1,8 +1,5 @@
-﻿using System.IO;
-using BepInEx;
-using BepInEx.Logging;
+﻿using BepInEx.Logging;
 using HarmonyLib;
-using UnityEngine.Serialization;
 using static ValheimWebLink.Web.Controllers.ExecuteCommand;
 
 namespace ValheimWebLink.Web.Controllers;
@@ -11,13 +8,14 @@ namespace ValheimWebLink.Web.Controllers;
 public class ExecuteCommand : IController
 {
     internal static bool runningCommand = false;
-    internal static StringBuilder commandLogBuilder = new();
+    internal static readonly StringBuilder commandLogBuilder = new();
     internal static bool executionHadError = false;
     public string Route => "/execute";
     public string HttpMethod => "POST";
     public string Description => "Execute known ingame terminal command";
+    public List<QueryParamInfo> QueryParameters => [new("command", "string", "Command to execute")];
 
-    public void HandleRequest(HttpListenerRequest request, HttpListenerResponse response, bool isAuthed,
+    public Task HandleRequest(HttpListenerRequest request, HttpListenerResponse response, bool isAuthed,
         Dictionary<string, string> queryParameters)
     {
         runningCommand = false;
@@ -26,30 +24,15 @@ public class ExecuteCommand : IController
 
         if (!isAuthed)
         {
-            response.StatusCode = 401;
-            response.ContentType = "application/json";
-            response.ContentEncoding = Encoding.UTF8;
-            response.KeepAlive = false;
-            response.Close();
-            return;
+            WebApiManager.SendResponce(response, Unauthorized);
+            return Task.CompletedTask;
         }
 
-        ErrorResult? error = null;
         string text = queryParameters.TryGetValue("command", out var command) ? command : string.Empty;
         if (text == string.Empty)
         {
-            error = new("No command specified");
-
-            response.StatusCode = 400;
-            response.ContentType = "application/json";
-            response.ContentEncoding = Encoding.UTF8;
-            string responseString = JSON.ToJSON(error);
-            byte[] buffer = Encoding.UTF8.GetBytes(responseString);
-            response.ContentLength64 = buffer.Length;
-            using Stream output = response.OutputStream;
-            output.Write(buffer, 0, buffer.Length);
-
-            return;
+            WebApiManager.SendResponce(response, BadRequest, "No command specified");
+            return Task.CompletedTask;
         }
 
         string[] strArray = text.Split(' ');
@@ -60,35 +43,21 @@ public class ExecuteCommand : IController
                 runningCommand = true;
                 consoleCommand.RunAction(new(text, Console.instance));
                 runningCommand = false;
-            } else error = new($"'{text.Split(' ')[0]}' is not valid in the current context.");
+            } else
+            {
+                var message = $"'{text.Split(' ')[0]}' is not valid in the current context.";
+                WebApiManager.SendResponce(response, BadRequest, message);
+                return Task.CompletedTask;
+            }
         } else
         {
-            error = new("Command not found");
+            WebApiManager.SendResponce(response, BadRequest, "Command not found");
+            return Task.CompletedTask;
         }
 
         string commandLog = commandLogBuilder.ToString();
-
-        if (error.HasValue)
-        {
-            response.StatusCode = executionHadError ? 500 : 400;
-            response.ContentType = "application/json";
-            response.ContentEncoding = Encoding.UTF8;
-            string responseString = JSON.ToJSON(error);
-            byte[] buffer = Encoding.UTF8.GetBytes(responseString);
-            response.ContentLength64 = buffer.Length;
-            using Stream output = response.OutputStream;
-            output.Write(buffer, 0, buffer.Length);
-            return;
-        }
-
-        response.StatusCode = executionHadError ? 500 : 200;
-        response.ContentType = "text/plain";
-        response.ContentEncoding = Encoding.UTF8;
-        string _responseString = commandLog.IsGood() ? commandLog : "No log";
-        byte[] _buffer = Encoding.UTF8.GetBytes(_responseString);
-        response.ContentLength64 = _buffer.Length;
-        using Stream _output = response.OutputStream;
-        _output.Write(_buffer, 0, _buffer.Length);
+        WebApiManager.SendResponce(response, executionHadError ? 500 : 200, commandLog);
+        return Task.CompletedTask;
     }
 }
 
@@ -116,10 +85,4 @@ file static class Patch
         commandLogBuilder.AppendLine(value);
         return false;
     }
-}
-
-[Serializable]
-file struct ErrorResult(string message)
-{
-    public string message = message;
 }

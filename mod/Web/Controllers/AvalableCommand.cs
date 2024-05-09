@@ -1,5 +1,4 @@
-﻿using System.IO;
-using BepInEx;
+﻿using BepInEx;
 using BepInEx.Logging;
 using HarmonyLib;
 
@@ -11,18 +10,13 @@ public class AvalibleCommand : IController
     public string Route => "/avaliblecommands";
     public string HttpMethod => "GET";
     public string Description => "Returns all known ingame console commands";
+    public List<QueryParamInfo> QueryParameters => [];
 
-    public void HandleRequest(HttpListenerRequest request, HttpListenerResponse response, bool isAuthed,
+    public Task HandleRequest(HttpListenerRequest request, HttpListenerResponse response, bool isAuthed,
         Dictionary<string, string> queryParameters)
     {
-        response.StatusCode = 200;
-        response.ContentType = "application/json";
-        response.ContentEncoding = Encoding.UTF8;
-        string responseString = JSON.ToJSON(Result.Create());
-        byte[] buffer = Encoding.UTF8.GetBytes(responseString);
-        response.ContentLength64 = buffer.Length;
-        using Stream output = response.OutputStream;
-        output.Write(buffer, 0, buffer.Length);
+        WebApiManager.SendResponce(response, OK, "application/json", Result.Create());
+        return Task.CompletedTask;
     }
 }
 

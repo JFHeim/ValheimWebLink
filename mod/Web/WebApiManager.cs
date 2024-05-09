@@ -1,7 +1,8 @@
-﻿using System.IO;
-using System.Reflection;
+﻿using System.Reflection;
 using BepInEx;
 using ValheimWebLink.Web.Controllers;
+using System.Net;
+using System.Web;
 
 namespace ValheimWebLink.Web;
 
@@ -179,7 +180,7 @@ public static class WebApiManager
         }
     }
 
-    private static void HandleRequest(HttpListenerContext context, CancellationToken cancellationToken)
+    private static async Task HandleRequest(HttpListenerContext context, CancellationToken cancellationToken)
     {
         if (cancellationToken.IsCancellationRequested)
         {
@@ -199,34 +200,26 @@ public static class WebApiManager
                 Debug($"Got {absolutePath} request, url: {url}");
                 try
                 {
-                    controller.HandleRequest(request, response, IsAuthed(request), GetQueryParameters(request));
+                    await controller.HandleRequest(request, response, IsAuthed(request), GetQueryParameters(request));
                 }
                 catch (Exception e)
                 {
                     DebugError($"Request handler threw an exception: {e}");
-                    response.StatusCode = 500;
-                    response.ContentType = "application/json";
-                    response.ContentEncoding = Encoding.UTF8;
-                    string _responseString = JSON.ToJSON(new WebExceptionJSON(e));
-                    byte[] _buffer = Encoding.UTF8.GetBytes(_responseString);
-                    response.ContentLength64 = _buffer.Length;
-                    using Stream _output = response.OutputStream;
-                    _output.Write(_buffer, 0, _buffer.Length);
+                    SendResponce(response, 500, "application/json", new WebExceptionJSON(e));
                 }
 
+                response.Close();
                 return;
             }
 
-        DebugWarning($"HandleRequest: Request for {httpMethod} {absolutePath} was not found. Url: {url}");
+        if (Controllers.ToList().Exists(x => x.Route == absolutePath))
+        {
+            SendResponce(response, MethodNotAllowed);
+            return;
+        }
 
-        response.StatusCode = 404;
-        response.ContentType = "text/plain";
-        response.ContentEncoding = Encoding.UTF8;
-        string responseString = "404 Not Found";
-        byte[] buffer = Encoding.UTF8.GetBytes(responseString);
-        response.ContentLength64 = buffer.Length;
-        using Stream output = response.OutputStream;
-        output.Write(buffer, 0, buffer.Length);
+        SendResponce(response, BadRequest);
+        response.Close();
     }
 
     public static bool IsAuthed(HttpListenerRequest request)
@@ -264,7 +257,7 @@ public static class WebApiManager
         if (request == null)
             return parameters;
 
-        string queryParams = request.Url.Query;
+        string queryParams = Uri.UnescapeDataString(request.Url.Query);
 
         if (!string.IsNullOrEmpty(queryParams))
         {
@@ -283,6 +276,35 @@ public static class WebApiManager
 
         return parameters;
     }
+
+    public static void SendResponce(HttpListenerResponse response, int status, string contentType, object obj)
+    {
+        response.StatusCode = status;
+
+        response.ContentType = contentType;
+        response.ContentEncoding = Encoding.UTF8;
+        string responseString = contentType == "application/json" ? JSON.ToJSON(obj) : (string)obj;
+        byte[] buffer = Encoding.UTF8.GetBytes(responseString);
+        response.ContentLength64 = buffer.Length;
+        using Stream output = response.OutputStream;
+        output.Write(buffer, 0, buffer.Length);
+    }
+
+    public static void SendResponce(HttpListenerResponse response, HttpStatusCode status, string contentType,
+        object obj) =>
+        SendResponce(response, (int)status, contentType, obj);
+
+    public static void SendResponce(HttpListenerResponse response, int status) =>
+        SendResponce(response, status, "text/plain", "");
+
+    public static void SendResponce(HttpListenerResponse response, HttpStatusCode status) =>
+        SendResponce(response, (int)status, "text/plain", "");
+
+    public static void SendResponce(HttpListenerResponse response, int status, string message) =>
+        SendResponce(response, status, "text/plain", message);
+
+    public static void SendResponce(HttpListenerResponse response, HttpStatusCode status, string message) =>
+        SendResponce(response, status, "text/plain", message);
 }
 
 public class AuthData

@@ -1,6 +1,4 @@
-﻿using System.IO;
-using BepInEx.Bootstrap;
-using ValheimWebLink.Models;
+﻿using BepInEx.Bootstrap;
 
 namespace ValheimWebLink.Web.Controllers;
 
@@ -10,19 +8,13 @@ public class ServerInfo : IController
     public string Route => "/serverinfo";
     public string HttpMethod => "GET";
     public string Description => "Returns vast server info";
+    public List<QueryParamInfo> QueryParameters => [];
 
-    public void HandleRequest(HttpListenerRequest request, HttpListenerResponse response, bool isAuthed,
+    public Task HandleRequest(HttpListenerRequest request, HttpListenerResponse response, bool isAuthed,
         Dictionary<string, string> queryParameters)
     {
-        response.StatusCode = 200;
-        response.ContentType = "application/json";
-        response.ContentEncoding = Encoding.UTF8;
-        var data = ServerInfoData.Create();
-        string responseString = JSON.ToJSON(data);
-        byte[] buffer = Encoding.UTF8.GetBytes(responseString);
-        response.ContentLength64 = buffer.Length;
-        using Stream output = response.OutputStream;
-        output.Write(buffer, 0, buffer.Length);
+        WebApiManager.SendResponce(response, 200, "application/json", ServerInfoData.Create());
+        return Task.CompletedTask;
     }
 }
 
@@ -33,7 +25,7 @@ file struct ServerInfoData
     public string version;
     public int worldSeed;
     public int playersCount;
-    public PlayerInfo[] players;
+    public string[] players;
     public string[] globalKeys;
     public string[] adminList;
     public string[] banList;
@@ -45,7 +37,7 @@ file struct ServerInfoData
         var version = Version.GetVersionString();
         var worldSeed = WorldGenerator.instance?.m_world?.m_seed ?? default;
         var playersCount = ZNet.instance?.GetNrOfPlayers() ?? 0;
-        var players = ZNet.instance?.GetPlayerList().Select(PlayerInfo.Create).ToArray() ?? [];
+        var players = ZNet.instance?.GetPlayerList().Select(x => x.m_name).ToArray() ?? [];
         var globalKeys = ZoneSystem.instance?.GetGlobalKeys().ToArray() ?? [];
         var adminList = ZNet.instance?.m_adminList.GetList().ToArray() ?? [];
         var banList = ZNet.instance?.m_bannedList.GetList().ToArray() ?? [];

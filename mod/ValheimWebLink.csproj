@@ -100,16 +100,22 @@
     <ItemGroup>
         <Compile Include="ConsoleCommands\ConsoleCommandsManager.cs" />
         <Compile Include="GlobalUsings.cs"/>
-        <Compile Include="Models\PlayerInfo.cs" />
         <Compile Include="Plugin.cs"/>
         <Compile Include="Properties\AssemblyInfo.cs"/>
         <Compile Include="Web\Controllers\AvalableCommand.cs" />
         <Compile Include="Web\Controllers\ExecuteCommand.cs" />
+        <Compile Include="Web\Controllers\FindObjects\FindObjects.cs" />
+        <Compile Include="Web\Controllers\FindObjects\RecordPrefabNames.cs" />
         <Compile Include="Web\Controllers\GetLog.cs" />
+        <Compile Include="Web\Controllers\PlayerData\GetPlayerData.cs" />
+        <Compile Include="Web\Controllers\PlayerData\PlayerData.cs" />
+        <Compile Include="Web\Controllers\PlayerData\SetPlayerData.cs" />
         <Compile Include="Web\Controllers\MainRoute.cs" />
         <Compile Include="Web\Controllers\ServerInfo.cs" />
         <Compile Include="Web\ControllerAttribute.cs" />
         <Compile Include="Web\IController.cs" />
+        <Compile Include="Web\MessageResult.cs" />
+        <Compile Include="Web\QueryParamInfo.cs" />
         <Compile Include="Web\WebApiManager.cs" />
         <Compile Include="Web\WebExceptionJSON.cs" />
     </ItemGroup>
