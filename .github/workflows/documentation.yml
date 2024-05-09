@@ -1,0 +1,37 @@
+﻿name: Update documentation on Controller changes
+
+on:
+  push:
+    paths:
+      - "Web/Controllers/**"
+
+jobs:
+  update-readme:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.x
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+
+      - name: Run python script
+        run: python .github/workflows/documentation_update.py
+
+      - name: Commit and push changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add -A
+          git commit -m "Update README" || true  # Ignore if there are no changes to commit
+          git push
+
+        env:
+          GITHUB_TOKEN: ${{ secrets.COMMITS_TOKEN }}
