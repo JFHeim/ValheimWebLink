@@ -5,7 +5,7 @@ public class FindObjects : IController
 {
     public string Route => "/findobjects";
     public string HttpMethod => "GET";
-    public string Description => "Searches for objects in the world in given range";
+    public string Description => "Searches for objects in the world in given range. To see full data of objects, install WorldObjectsData module.";
 
     public List<QueryParamInfo> QueryParameters =>
     [

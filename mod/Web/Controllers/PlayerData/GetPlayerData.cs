@@ -5,7 +5,7 @@ public class GetPlayerData : IController
 {
     public string Route => "/playerdata/get";
     public string HttpMethod => "GET";
-    public string Description => "Returns detail information about the player";
+    public string Description => "Returns detail information about the player. Requires authentication. To get more data about the player, install PlayerData module.";
     public List<QueryParamInfo> QueryParameters => [new("name", "string", "Name of the player")];
 
     public async Task HandleRequest(HttpListenerRequest request, HttpListenerResponse response, bool isAuthed,

@@ -121,7 +121,6 @@
     </ItemGroup>
     <ItemGroup>
       <Content Include="ILRepack.targets" />
-      <Content Include="README.md" />
     </ItemGroup>
     <ItemGroup>
       <None Include="packages.config" />

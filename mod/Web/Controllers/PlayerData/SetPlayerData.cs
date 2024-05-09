@@ -5,7 +5,7 @@ public class SetPlayerData : IController
 {
     public string Route => "/playerdata/set";
     public string HttpMethod => "POST";
-    public string Description => "Provides way to override player data";
+    public string Description => "Provides way to override player data. Requires authentication. Requires PlayerData module installed.";
 
     public List<QueryParamInfo> QueryParameters =>
     [

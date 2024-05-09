@@ -12,7 +12,7 @@ public class ExecuteCommand : IController
     internal static bool executionHadError = false;
     public string Route => "/execute";
     public string HttpMethod => "POST";
-    public string Description => "Execute known ingame terminal command";
+    public string Description => "Execute known ingame terminal command. Requires authentication. Returns logs of command execution.";
     public List<QueryParamInfo> QueryParameters => [new("command", "string", "Command to execute")];
 
     public Task HandleRequest(HttpListenerRequest request, HttpListenerResponse response, bool isAuthed,

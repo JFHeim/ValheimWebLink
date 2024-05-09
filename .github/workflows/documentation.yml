@@ -3,7 +3,7 @@
 on:
   push:
     paths:
-      - "Web/Controllers/**"
+      - "mod/Web/Controllers/**"
     branches:
       - "*"
 
