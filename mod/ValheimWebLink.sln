@@ -1,5 +1,7 @@
 ﻿Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ValheimWebLink", "ValheimWebLink.csproj", "{02CE308D-1155-4B96-AD14-80AA60C2D79D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ValheimWebLink", "core/ValheimWebLink.csproj", "{02CE308D-1155-4B96-AD14-80AA60C2D79D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VWL_WorldObjectsData", "WorldObjectsData\VWL_WorldObjectsData.csproj", "{1ED47FF7-4B37-46DF-9595-8F7C133A76DD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,5 +13,9 @@ Global
 		{02CE308D-1155-4B96-AD14-80AA60C2D79D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{02CE308D-1155-4B96-AD14-80AA60C2D79D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{02CE308D-1155-4B96-AD14-80AA60C2D79D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1ED47FF7-4B37-46DF-9595-8F7C133A76DD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1ED47FF7-4B37-46DF-9595-8F7C133A76DD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1ED47FF7-4B37-46DF-9595-8F7C133A76DD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1ED47FF7-4B37-46DF-9595-8F7C133A76DD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

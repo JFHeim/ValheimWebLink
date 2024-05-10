@@ -5,7 +5,9 @@ public class FindObjects : IController
 {
     public string Route => "/findobjects";
     public string HttpMethod => "GET";
-    public string Description => "Searches for objects in the world in given range. To see full data of objects, install WorldObjectsData module.";
+
+    public string Description =>
+        "Searches for objects in the world in given range. To see full data of objects, install WorldObjectsData module.";
 
     public List<QueryParamInfo> QueryParameters =>
     [
@@ -42,37 +44,7 @@ public class FindObjects : IController
         var objects = await ZoneSystem.instance.GetWorldObjectsAsync(x =>
             Vector2.Distance(center, x.GetPosition().ToV2()) <= radius);
 
-        WebApiManager.SendResponce(response, OK, "application/json", Result.Create(objects));
+        var result = FindObjectsResult.Create(objects);
+        WebApiManager.SendResponce(response, OK, "application/json", result);
     }
-}
-
-[Serializable]
-file struct Result()
-{
-    public List<ObjectInfo> objects = [];
-
-    public static Result Create(List<ZDO> list)
-    {
-        var result = new Result();
-        foreach (var zdo in list)
-        {
-            result.objects.Add(new ObjectInfo()
-            {
-                prefabHash = zdo.GetPrefab(),
-                prefabName =
-                    RecordPrefabNames.prefabNames.TryGetValue(zdo.GetPrefab(), out var name) ? name : "Unknown",
-                position = zdo.GetPosition(),
-            });
-        }
-
-        return result;
-    }
-}
-
-[Serializable]
-file struct ObjectInfo()
-{
-    public int prefabHash;
-    public string prefabName;
-    public SimpleVector3 position;
 }
