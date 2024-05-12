@@ -1,4 +1,4 @@
-﻿namespace ValheimWebLink.Web.Controllers.FindObjects;
+﻿namespace ValheimWebLink.Web.Controllers.FindObjects.Models;
 
 [Serializable]
 public class ItemData : ObjectData
@@ -14,7 +14,7 @@ public class ItemData : ObjectData
 
     public ItemData() => objectType = RecordPrefabs.ObjectType.Item.ToString();
 
-    public override ObjectData Init(ZDO zdo)
+    public override async Task<ObjectData> Init(ZDO zdo)
     {
         base.Init(zdo);
         spawnTime = zdo.GetLong(ZDOVars.s_spawnTime);

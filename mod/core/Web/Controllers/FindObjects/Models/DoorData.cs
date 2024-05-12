@@ -1,4 +1,4 @@
-﻿namespace ValheimWebLink.Web.Controllers.FindObjects;
+﻿namespace ValheimWebLink.Web.Controllers.FindObjects.Models;
 
 [Serializable]
 public class DoorData : PieceData
@@ -7,7 +7,7 @@ public class DoorData : PieceData
 
     public DoorData() => objectType = RecordPrefabs.ObjectType.Door.ToString();
 
-    public override ObjectData Init(ZDO zdo)
+    public override async Task<ObjectData> Init(ZDO zdo)
     {
         base.Init(zdo);
         isOpen = zdo.GetInt(ZDOVars.s_state) == 0;

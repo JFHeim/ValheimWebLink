@@ -1,15 +1,16 @@
 ﻿using BepInEx.Logging;
 using HarmonyLib;
 using static ValheimWebLink.Web.Controllers.ExecuteCommand;
+using Logger = BepInEx.Logging.Logger;
 
 namespace ValheimWebLink.Web.Controllers;
 
 [Controller]
 public class ExecuteCommand : IController
 {
-    internal static bool runningCommand = false;
+    internal static bool runningCommand;
     internal static readonly StringBuilder commandLogBuilder = new();
-    internal static bool executionHadError = false;
+    internal static bool executionHadError;
     public string Route => "/execute";
     public string HttpMethod => "POST";
     public string Description => "Execute known ingame terminal command. Requires authentication. Returns logs of command execution.";
@@ -64,7 +65,7 @@ public class ExecuteCommand : IController
 [HarmonyPatch, HarmonyWrapSafe]
 file static class Patch
 {
-    [HarmonyPatch(typeof(BepInEx.Logging.Logger), nameof(BepInEx.Logging.Logger.InternalLogEvent))]
+    [HarmonyPatch(typeof(Logger), nameof(Logger.InternalLogEvent))]
     [HarmonyPrefix]
     private static bool SupressLogging(LogEventArgs eventArgs)
     {

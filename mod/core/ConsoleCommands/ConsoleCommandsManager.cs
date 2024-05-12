@@ -2,6 +2,7 @@
 using BepInEx.Logging;
 using ValheimWebLink.Web;
 using static System.ConsoleColor;
+using Logger = BepInEx.Logging.Logger;
 
 namespace ValheimWebLink.ConsoleCommands;
 
@@ -12,13 +13,13 @@ public static class ConsoleCommandsManager
 
     public static void Init()
     {
-        foreach (var listener in BepInEx.Logging.Logger.Listeners)
+        foreach (var listener in Logger.Listeners)
             if (listener.GetType() == typeof(DiskLogListener))
                 DiskDebugListener = (DiskLogListener)listener;
 
         if (!Application.isBatchMode)
         {
-            DebugError("This script should only be used in batch mode (headless server).");
+            Debug($"Console commands of {ModName} can be used only in batch mode (headless server).", DarkRed);
             return;
         }
 
@@ -97,14 +98,28 @@ public static class ConsoleCommandsManager
 
         if (input.Equals("getport"))
         {
-            Debug($"Port={WebApiManager.Port}");
+            Debug($"Port={SettingsManager.instance.port}");
             return;
         }
+
+        // if (input.StartsWith("setport"))
+        // {
+        //     var newPortString = input.Split()[1];
+        //     if (short.TryParse(newPortString, out var newPort) == false)
+        //     {
+        //         Debug($"Invalid port: {newPortString}", Red);
+        //         return;
+        //     }
+        //
+        //     Settings.instance.port = newPort;
+        //     Debug($"Port={Settings.instance.port}");
+        //     return;
+        // }
 
         if (input.Equals("restart"))
         {
             WebApiManager.Stop();
-            WebApiManager.Init(WebApiManager.Port);
+            WebApiManager.Init();
             return;
         }
 

@@ -1,8 +1,6 @@
 ﻿using System.Reflection;
 using BepInEx;
 using ValheimWebLink.Web.Controllers;
-using System.Net;
-using System.Web;
 
 namespace ValheimWebLink.Web;
 
@@ -10,18 +8,29 @@ public static class WebApiManager
 {
     public static HashSet<IController> Controllers { get; private set; } = [];
     private static HttpListener _listener;
-    private static string _url = "http://*:{0}/";
-    public static short Port { get; private set; } = 8080;
     public static CancellationTokenSource _cancellationTokenSource { get; private set; }
 
     private static AuthData _authData;
 
-    public static void Init(short port)
+    public static void ReloadPort()
     {
-        Port = port;
-        _url = string.Format(_url, port);
+        var port = SettingsManager.instance.port;
+        Debug($"Reloading Web API server on port {port}...", ConsoleColor.DarkGreen);
+        _listener?.Stop();
+        _listener?.Prefixes.Clear();
+        _listener?.Prefixes.Add($"http://*:{port}/");
+        _listener?.Start();
+        Debug($"Web API server on port {port} reloaded", ConsoleColor.Green);
+    }
+
+    public static void Init()
+    {
+        var port = SettingsManager.instance.port;
+        Debug($"Starting Web API server on port {port}...");
         _listener = new HttpListener();
-        _listener.Prefixes.Add(_url);
+        _listener.Prefixes.Add($"http://*:{port}/");
+        //TODO: Add https
+        _listener.Start();
 
         _cancellationTokenSource = new CancellationTokenSource();
 
@@ -60,8 +69,8 @@ public static class WebApiManager
         catch (Exception e)
         {
             File.WriteAllText("auth.json", JSON.ToNiceJSON(authData));
-            Debug("Your login and password are default or file is corrupted. "
-                  + $"You MUST edit it before running the server.\n"
+            Debug("Your auth.json file is corrupted. "
+                  + "You MUST edit it before running the server.\n"
                   + $"Exeption: {e.GetType().Name} {e.Message}",
                 ConsoleColor.DarkMagenta);
 
@@ -77,7 +86,7 @@ public static class WebApiManager
 
     private static void SetupAuthDataWatcher()
     {
-        if (!File.Exists(Path.Combine(Paths.GameRootPath, "auth.json")))
+        if (!File.Exists("auth.json"))
         {
             Debug("This can not happen");
             return;
@@ -92,7 +101,7 @@ public static class WebApiManager
                 if (authData == null)
                 {
                     Debug("Your login and password are default or file is corrupted. "
-                          + $"You MUST edit it before running the server.",
+                          + "You MUST edit it before running the server.",
                         ConsoleColor.DarkMagenta);
                     return;
                 }
@@ -102,7 +111,7 @@ public static class WebApiManager
             catch (Exception exception)
             {
                 Debug("Your login and password are default or file is corrupted. "
-                      + $"You MUST edit it before running the server.\n"
+                      + "You MUST edit it before running the server.\n"
                       + $"Exeption: {exception.GetType().Name} {exception.Message}",
                     ConsoleColor.DarkMagenta);
             }
@@ -134,9 +143,9 @@ public static class WebApiManager
 
     public static void Stop()
     {
+        Debug("Stopping server...");
         _cancellationTokenSource?.Cancel();
         _listener?.Stop();
-        _listener?.Close();
     }
 
     private static async void Listen(CancellationToken cancellationToken)
@@ -144,8 +153,7 @@ public static class WebApiManager
         try
         {
             _listener.Start();
-            Debug("Listening for requests on: " + _url);
-            Debug($"\n\n"
+            Debug($"\n"
                   + $"Some requests required authentication\n"
                   + $"Your login and password are stored in the file 'auth.json'\n"
                   + $"You MUST edit it before running the server\n"
@@ -176,7 +184,7 @@ public static class WebApiManager
         finally
         {
             _listener.Close();
-            Debug("Stopped listening for requests on: " + _url);
+            Debug("Stopped listening for requests");
         }
     }
 

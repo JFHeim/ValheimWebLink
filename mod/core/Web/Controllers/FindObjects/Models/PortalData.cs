@@ -1,4 +1,4 @@
-﻿namespace ValheimWebLink.Web.Controllers.FindObjects;
+﻿namespace ValheimWebLink.Web.Controllers.FindObjects.Models;
 
 [Serializable]
 public class PortalData : PieceData
@@ -8,7 +8,7 @@ public class PortalData : PieceData
 
     public PortalData() => objectType = RecordPrefabs.ObjectType.Portal.ToString();
 
-    public override ObjectData Init(ZDO zdo)
+    public override async Task<ObjectData> Init(ZDO zdo)
     {
         base.Init(zdo);
         tag = zdo.GetString(ZDOVars.s_tag);

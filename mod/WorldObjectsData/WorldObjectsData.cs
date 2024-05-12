@@ -1,5 +1,4 @@
 ﻿using BepInEx;
-using BepInEx.Bootstrap;
 
 namespace VWL_WorldObjectsData;
 
@@ -15,20 +14,26 @@ internal class WorldObjectsData : BaseUnityPlugin
 
     private void Awake()
     {
-        var coreInstalled = Chainloader.PluginInfos.ContainsKey("com.Frogger.ValheimWebLink");
-        if (SteamManager.APP_ID == 896660 && !coreInstalled)
-        {
-            Logger.LogError(
-                $"To uses any module for ValheimWebLink on server you need to have ValheimWebLink mod installed. "
-                + $"Please install it. Clients should not have ValheimWebLink installed.\n\n"
-                + $"Quitting...");
-            return;
-        } else if (coreInstalled)
-        {
-            Logger.LogError("Clients should not have ValheimWebLink installed.\n"
-                            + "Quitting...");
-            return;
-        }
+        // var coreInstalled = Chainloader.PluginInfos.ContainsKey("com.Frogger.ValheimWebLink");
+        // Logger.LogWarning($"SteamManager.APP_ID = {SteamManager.APP_ID}");
+        
+        // if (SteamManager.APP_ID == 896660)
+        // {
+        //     if (!coreInstalled)
+        //     {
+        //         Logger.LogError(
+        //             $"To uses any module for ValheimWebLink on server you need to have ValheimWebLink mod installed. "
+        //             + $"Please install it. Clients should not have ValheimWebLink installed.\n\n"
+        //             + $"Quitting...");
+        //
+        //         return; 
+        //     }
+        // } else if (coreInstalled)
+        // {
+        //     Logger.LogError("Clients should not have ValheimWebLink installed.\n"
+        //                     + "Quitting...");
+        //     return;
+        // }
 
         CreateMod(this, ModName, ModAuthor, ModVersion, ModGUID);
     }

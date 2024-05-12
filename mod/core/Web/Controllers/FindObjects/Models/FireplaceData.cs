@@ -1,4 +1,4 @@
-﻿namespace ValheimWebLink.Web.Controllers.FindObjects;
+﻿namespace ValheimWebLink.Web.Controllers.FindObjects.Models;
 
 [Serializable]
 public class FireplaceData : PieceData
@@ -7,7 +7,7 @@ public class FireplaceData : PieceData
 
     public FireplaceData() => objectType = RecordPrefabs.ObjectType.Fireplace.ToString();
 
-    public override ObjectData Init(ZDO zdo)
+    public override async Task<ObjectData> Init(ZDO zdo)
     {
         base.Init(zdo);
         fuel = zdo.GetFloat(ZDOVars.s_fuel);

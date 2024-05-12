@@ -14,8 +14,6 @@ global using JetBrains.Annotations;
 global using JFUtils;
 global using TMPro;
 global using UnityEngine;
-global using ValheimWebLink;
-global using static ValheimWebLink.Plugin;
 global using static System.Net.HttpStatusCode;
 global using Object = UnityEngine.Object;
 global using static JFUtils.ModBase;

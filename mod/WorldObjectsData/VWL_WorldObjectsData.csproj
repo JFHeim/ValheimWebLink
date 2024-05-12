@@ -75,6 +75,9 @@
         <Reference Include="com.rlabrecque.steamworks.net">
             <HintPath>$(UtilsDir)\com.rlabrecque.steamworks.net.dll</HintPath>
         </Reference>
+        <Reference Include="fastJSON">
+          <HintPath>..\..\..\Utils\fastJSON.dll</HintPath>
+        </Reference>
         <Reference Include="JFUtils">
             <HintPath>$(UtilsDir)\JFUtils.dll</HintPath>
         </Reference>
@@ -101,6 +104,7 @@
     </ItemGroup>
     <ItemGroup>
         <Compile Include="GlobalUsings.cs"/>
+        <Compile Include="Patch\RegisterRPCs.cs" />
         <Compile Include="WorldObjectsData.cs"/>
         <Compile Include="Properties\AssemblyInfo.cs"/>
     </ItemGroup>
@@ -108,13 +112,7 @@
         <Content Include="ILRepack.targets"/>
     </ItemGroup>
     <ItemGroup>
-        <None Include="packages.config"/>
-    </ItemGroup>
-    <ItemGroup>
-        <ProjectReference Include="..\core\ValheimWebLink.csproj">
-            <Project>{02ce308d-1155-4b96-ad14-80aa60c2d79d}</Project>
-            <Name>ValheimWebLink</Name>
-        </ProjectReference>
+      <None Include="packages.config" />
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets"/>
 
@@ -123,5 +121,14 @@
         <Copy SourceFiles="$(TargetDir)$(ProjectName).dll" DestinationFolder="D:\Steam\steamapps\common\Valheim\BepInEx\plugins"/>
         <Copy SourceFiles="$(TargetDir)$(ProjectName).dll" DestinationFolder="D:\Steam\steamapps\common\Valheim dedicated server\BepInEx\plugins"/>
         <Message Importance="High" Text="Copied $(ProjectName).dll to D:\Slava\Coding\_Publish\Frogger-$(ProjectName) and D:\Steam\steamapps\common\Valheim\BepInEx\plugins"/>
+    </Target>
+
+    <Import Project="..\packages\ILRepack.Lib.MSBuild.Task.2.0.32\build\ILRepack.Lib.MSBuild.Task.targets" Condition="Exists('..\packages\ILRepack.Lib.MSBuild.Task.2.0.32\build\ILRepack.Lib.MSBuild.Task.targets')" />
+
+    <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+      <PropertyGroup>
+        <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105.The missing file is {0}.</ErrorText>
+      </PropertyGroup>
+      <Error Condition="!Exists('..\packages\ILRepack.Lib.MSBuild.Task.2.0.32\build\ILRepack.Lib.MSBuild.Task.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\ILRepack.Lib.MSBuild.Task.2.0.32\build\ILRepack.Lib.MSBuild.Task.targets'))" />
     </Target>
 </Project>

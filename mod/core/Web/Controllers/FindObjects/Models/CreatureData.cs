@@ -1,4 +1,4 @@
-﻿namespace ValheimWebLink.Web.Controllers.FindObjects;
+﻿namespace ValheimWebLink.Web.Controllers.FindObjects.Models;
 
 [Serializable]
 public class CreatureData : ObjectData
@@ -11,7 +11,7 @@ public class CreatureData : ObjectData
 
     public CreatureData() => objectType = RecordPrefabs.ObjectType.Creature.ToString();
 
-    public override ObjectData Init(ZDO zdo)
+    public override async Task<ObjectData> Init(ZDO zdo)
     {
         base.Init(zdo);
         tamed = zdo.GetBool(ZDOVars.s_tamed);

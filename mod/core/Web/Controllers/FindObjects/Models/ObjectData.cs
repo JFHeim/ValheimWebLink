@@ -1,4 +1,4 @@
-﻿namespace ValheimWebLink.Web.Controllers.FindObjects;
+﻿namespace ValheimWebLink.Web.Controllers.FindObjects.Models;
 
 [Serializable]
 public class ObjectData
@@ -8,7 +8,7 @@ public class ObjectData
     public string prefabName;
     public SimpleVector3 position;
 
-    public virtual ObjectData Init(ZDO zdo)
+    public virtual async Task<ObjectData> Init(ZDO zdo)
     {
         prefabHash = zdo.GetPrefab();
         prefabName = RecordPrefabs.prefabNames.TryGetValue(zdo.GetPrefab(), out var name) ? name : "Unknown";

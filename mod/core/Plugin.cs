@@ -49,7 +49,11 @@ public class Plugin : BaseUnityPlugin
         if (MobulesInstalled.Count > 0)
             Debug($"Mobules installed: {MobulesInstalled.GetString()}");
 
-        WebApiManager.Init(8080);
+        Debug("Initializing settings...");
+        SettingsManager.Init();
+        Debug("Initializing web api...");
+        WebApiManager.Init();
+        Debug("Initializing console commands...");
         ConsoleCommandsManager.Init();
     }
 

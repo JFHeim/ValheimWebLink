@@ -1,8 +1,4 @@
-﻿using BepInEx;
-using BepInEx.Logging;
-using HarmonyLib;
-
-namespace ValheimWebLink.Web.Controllers;
+﻿namespace ValheimWebLink.Web.Controllers;
 
 [Controller]
 public class AvalibleCommand : IController
@@ -21,7 +17,7 @@ public class AvalibleCommand : IController
 }
 
 [Serializable]
-file struct CommandInfo()
+file struct CommandInfo
 {
     public string command;
     public string description;
