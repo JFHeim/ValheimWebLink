@@ -10,7 +10,7 @@ public class PortalData : PieceData
 
     public override async Task<ObjectData> Init(ZDO zdo)
     {
-        base.Init(zdo);
+        await base.Init(zdo);
         tag = zdo.GetString(ZDOVars.s_tag);
         tagauthor = zdo.GetString(ZDOVars.s_tagauthor);
 

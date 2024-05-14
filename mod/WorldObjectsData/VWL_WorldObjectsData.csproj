@@ -14,6 +14,7 @@
         <LangVersion>preview</LangVersion>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <FileAlignment>512</FileAlignment>
+        <Nullable>enable</Nullable>
     </PropertyGroup>
     <PropertyGroup>
         <GameDir>D:\Steam\steamapps\common\Valheim</GameDir>
@@ -104,7 +105,11 @@
     </ItemGroup>
     <ItemGroup>
         <Compile Include="GlobalUsings.cs"/>
+        <Compile Include="InventoryData.cs" />
         <Compile Include="Patch\RegisterRPCs.cs" />
+        <Compile Include="HandlerSendPlayerInventory.cs" />
+        <Compile Include="HandlerSetPlayerData.cs" />
+        <Compile Include="PlayerData.cs" />
         <Compile Include="WorldObjectsData.cs"/>
         <Compile Include="Properties\AssemblyInfo.cs"/>
     </ItemGroup>

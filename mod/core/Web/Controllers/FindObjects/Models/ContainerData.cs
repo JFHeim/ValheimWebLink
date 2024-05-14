@@ -11,7 +11,7 @@ public class ContainerData : ObjectData
 
     public override async Task<ObjectData> Init(ZDO zdo)
     {
-        base.Init(zdo);
+        await base.Init(zdo);
         isInUse = zdo.GetInt(ZDOVars.s_inUse) == 1;
         string base64String = zdo.GetString(ZDOVars.s_items);
         if (base64String.IsGood())

@@ -55,29 +55,7 @@ public class GetPlayerData : IController
         if (playerZdo.Count == 0) return (NotFound, "Player not found", result);
         if (playerZdo.Count > 1) return (InternalServerError, "Too many players found with same name", result);
         var plZdo = playerZdo.Single();
-        result.name = name;
-        result.position = plZdo.GetPosition();
-        result.health = (int)plZdo.GetFloat(ZDOVars.s_health);
-        result.maxHealth = (int)plZdo.GetFloat(ZDOVars.s_maxHealth);
-        result.stamina = (int)plZdo.GetFloat(ZDOVars.s_stamina);
-        result.eitr = (int)plZdo.GetFloat(ZDOVars.s_eitr);
-        result.alive = !plZdo.GetBool(ZDOVars.s_dead);
-        result.inDebugFly = plZdo.GetBool(ZDOVars.s_debugFly);
-        result.pvp = plZdo.GetBool(ZDOVars.s_pvp);
-        // result.currentEmote = plZdo.GetString(ZDOVars.s_emote);
-        result.inBed = plZdo.GetBool(ZDOVars.s_inBed);
-        result.noise = plZdo.GetFloat(ZDOVars.s_noise);
-        result.playerID = plZdo.GetLong(ZDOVars.s_playerID);
-        // result.randomSkillFactor = plZdo.GetFloat(ZDOVars.s_randomSkillFactor);
-
-
-        ZNet.PlayerInfo playerInfo = ZNet.instance.GetPlayerList().Find(x => x.m_name == name);
-        var user = PrivilegeManager.ParseUser(playerInfo.m_host);
-        result.platformId = user.id;
-        result.platform = user.platform.ToString();
-        result.publicPosition = playerInfo.m_publicPosition;
-        result.position = playerInfo.m_position.ToSimpleVector3();
-        result.isAdmin = ZNet.instance.PlayerIsAdmin(user.id.ToString());
+        await result.Init(plZdo);
 
         return (OK, string.Empty, result);
     }

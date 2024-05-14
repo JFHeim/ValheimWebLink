@@ -9,7 +9,7 @@ public class DoorData : PieceData
 
     public override async Task<ObjectData> Init(ZDO zdo)
     {
-        base.Init(zdo);
+        await base.Init(zdo);
         isOpen = zdo.GetInt(ZDOVars.s_state) == 0;
 
         return this;

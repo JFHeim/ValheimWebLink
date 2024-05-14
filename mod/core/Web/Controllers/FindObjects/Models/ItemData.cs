@@ -16,7 +16,7 @@ public class ItemData : ObjectData
 
     public override async Task<ObjectData> Init(ZDO zdo)
     {
-        base.Init(zdo);
+        await base.Init(zdo);
         spawnTime = zdo.GetLong(ZDOVars.s_spawnTime);
         durability = zdo.GetFloat(ZDOVars.s_durability);
         stack = zdo.GetInt(ZDOVars.s_stack);

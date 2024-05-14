@@ -17,13 +17,13 @@ public class Plugin : BaseUnityPlugin
         ModVersion = "0.1.0",
         ModGUID = $"com.{ModAuthor}.{ModName}";
 
-    public static List<string> MobulesInstalled = [];
+    public static readonly List<string> MobulesInstalled = [];
 
     private void Awake()
     {
         CreateMod(this, ModName, ModAuthor, ModVersion, ModGUID);
 
-        JSONParameters = JSON.Parameters = new JSONParameters
+        JSONParameters = JSON.Parameters = new()
         {
             UseExtensions = false,
             SerializeNullValues = false,

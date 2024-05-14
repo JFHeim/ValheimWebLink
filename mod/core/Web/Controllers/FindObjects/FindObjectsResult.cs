@@ -22,7 +22,7 @@ public struct FindObjectsResult()
                     result.objects.Add(await new ObjectData().Init(zdo));
                     break;
                 case ObjectType.Player:
-                    result.objects.Add(await new PlayerData().Init(zdo));
+                    result.objects.Add(await new PlayerData().Init(zdo, true));
                     break;
                 case ObjectType.Creature:
                     result.objects.Add(await new CreatureData().Init(zdo));

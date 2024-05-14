@@ -44,7 +44,7 @@ public class FindObjects : IController
         var objects = await ZoneSystem.instance.GetWorldObjectsAsync(x =>
             Vector2.Distance(center, x.GetPosition().ToV2()) <= radius);
 
-        var result = FindObjectsResult.Create(objects);
+        var result = await FindObjectsResult.Create(objects);
         WebApiManager.SendResponce(response, OK, "application/json", result);
     }
 }

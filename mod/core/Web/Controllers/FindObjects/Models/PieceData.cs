@@ -11,7 +11,7 @@ public class PieceData : ObjectData
 
     public override async Task<ObjectData> Init(ZDO zdo)
     {
-        base.Init(zdo);
+        await base.Init(zdo);
         m_creator = zdo.GetString(ZDOVars.s_creatorName);
         if (!m_creator.IsGood()) m_creator = zdo.GetLong(ZDOVars.s_creator).ToString();
         health = zdo.GetFloat(ZDOVars.s_health);

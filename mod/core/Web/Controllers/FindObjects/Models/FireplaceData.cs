@@ -9,7 +9,7 @@ public class FireplaceData : PieceData
 
     public override async Task<ObjectData> Init(ZDO zdo)
     {
-        base.Init(zdo);
+        await base.Init(zdo);
         fuel = zdo.GetFloat(ZDOVars.s_fuel);
         
         return this;
