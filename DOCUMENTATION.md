@@ -29,21 +29,8 @@ Description: Returns all known ingame console commands<br>
 HttpMethod: GET<br>
 Has no query parameters
 
-### /findobjects
-Description: Searches for objects in the world in given range. To see full data of objects, install WorldObjectsData module.<br>
-HttpMethod: GET<br>
-Query parameters
-* centerpoint<br>
-    Description: Center point of the search<br>
-    Type: Vector2<br>
-
-* radius<br>
-    Description: Radius of the search<br>
-    Type: float<br>
-
-
 ### /playerdata/set
-Description: Provides way to override player data. Requires authentication. Requires PlayerData module installed.<br>
+Description: Provides way to override player data. Requires authentication. Requires WorldObjectsData module installed.<br>
 HttpMethod: POST<br>
 Query parameters
 * name<br>
@@ -56,11 +43,24 @@ Query parameters
 
 
 ### /playerdata/get
-Description: Returns detail information about the player. Requires authentication. To get more data about the player, install PlayerData module.<br>
+Description: Returns detail information about the player. Requires authentication. To get more data about the player, install WorldObjectsData module.<br>
 HttpMethod: GET<br>
 Query parameters
 * name<br>
     Description: Name of the player<br>
     Type: string<br>
+
+
+### /findobjects
+Description: Searches for objects in the world in given range. To see full data of objects, install WorldObjectsData module.<br>
+HttpMethod: GET<br>
+Query parameters
+* centerpoint<br>
+    Description: Center point of the search<br>
+    Type: Vector2<br>
+
+* radius<br>
+    Description: Radius of the search<br>
+    Type: float<br>
 
 
