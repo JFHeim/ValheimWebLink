@@ -89,7 +89,7 @@ def update_readme():
             f.write(entry + '\n')
 
 
-directory = os.getcwd() + "/mod/Web/Controllers"
+directory = os.getcwd() + "/mod/core/Web/Controllers"
 readme_path = "DOCUMENTATION.md"
 controllers = []
 readme_entries = []

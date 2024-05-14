@@ -1,4 +1,5 @@
 ﻿using BepInEx;
+using BepInEx.Bootstrap;
 using BepInEx.Logging;
 using ValheimWebLink.ConsoleCommands;
 using ValheimWebLink.Web;
@@ -7,18 +8,22 @@ namespace ValheimWebLink;
 
 [BepInPlugin(ModGUID, ModName, ModVersion)]
 [BepInDependency("com.Frogger.NoUselessWarnings", BepInDependency.DependencyFlags.SoftDependency)]
-internal class Plugin : BaseUnityPlugin
+public class Plugin : BaseUnityPlugin
 {
+    public static JSONParameters JSONParameters { get; private set; }
+
     private const string ModName = "ValheimWebLink",
         ModAuthor = "Frogger",
         ModVersion = "0.1.0",
         ModGUID = $"com.{ModAuthor}.{ModName}";
 
+    public static readonly List<string> MobulesInstalled = [];
+
     private void Awake()
     {
         CreateMod(this, ModName, ModAuthor, ModVersion, ModGUID);
 
-        JSON.Parameters = new JSONParameters
+        JSONParameters = JSON.Parameters = new()
         {
             UseExtensions = false,
             SerializeNullValues = false,
@@ -28,7 +33,27 @@ internal class Plugin : BaseUnityPlugin
             UseValuesOfEnums = true
         };
 
-        WebApiManager.Init(8080);
+        StartCoroutine(WaiteForFullLoad());
+    }
+
+    private IEnumerator WaiteForFullLoad()
+    {
+        yield return new WaitUntil(() => Chainloader._loaded);
+
+        foreach (var pluginInfos in Chainloader.PluginInfos.Values)
+        {
+            if (!pluginInfos.Metadata.Name.StartsWith("VWL_")) continue;
+            MobulesInstalled.Add(pluginInfos.Metadata.Name.Replace("VWL_", ""));
+        }
+
+        if (MobulesInstalled.Count > 0)
+            Debug($"Mobules installed: {MobulesInstalled.GetString()}");
+
+        Debug("Initializing settings...");
+        SettingsManager.Init();
+        Debug("Initializing web api...");
+        WebApiManager.Init();
+        Debug("Initializing console commands...");
         ConsoleCommandsManager.Init();
     }
 

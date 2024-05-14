@@ -1,0 +1,156 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props"
+            Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')"/>
+    <PropertyGroup>
+        <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+        <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+        <ProjectGuid>{02CE308D-1155-4B96-AD14-80AA60C2D79D}</ProjectGuid>
+        <OutputType>Library</OutputType>
+        <AppDesignerFolder>Properties</AppDesignerFolder>
+        <RootNamespace>ValheimWebLink</RootNamespace>
+        <AssemblyName>ValheimWebLink</AssemblyName>
+        <TargetFrameworkVersion>v4.8.1</TargetFrameworkVersion>
+        <FileAlignment>512</FileAlignment>
+        <LangVersion>preview</LangVersion>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    </PropertyGroup>
+    <PropertyGroup>
+        <GameDir>D:\Steam\steamapps\common\Valheim</GameDir>
+        <UtilsDir>D:\Slava\Coding\Utils</UtilsDir>
+    </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+        <PlatformTarget>AnyCPU</PlatformTarget>
+        <DebugSymbols>true</DebugSymbols>
+        <DebugType>full</DebugType>
+        <Optimize>false</Optimize>
+        <OutputPath>bin\Debug\</OutputPath>
+        <DefineConstants>DEBUG;TRACE</DefineConstants>
+        <ErrorReport>prompt</ErrorReport>
+        <WarningLevel>4</WarningLevel>
+    </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+        <PlatformTarget>AnyCPU</PlatformTarget>
+        <DebugType>pdbonly</DebugType>
+        <Optimize>true</Optimize>
+        <OutputPath>bin\Release\</OutputPath>
+        <DefineConstants>TRACE</DefineConstants>
+        <ErrorReport>prompt</ErrorReport>
+        <WarningLevel>4</WarningLevel>
+    </PropertyGroup>
+    <ItemGroup>
+        <Reference Include="0Harmony">
+            <HintPath>$(GamePath)\BepInEx\core\0Harmony.dll</HintPath>
+        </Reference>
+        <Reference Include="Accessibility">
+            <HintPath>$(UtilsDir)\Accessibility_publicized.dll</HintPath>
+        </Reference>
+        <Reference Include="Assembly-CSharp">
+            <HintPath>$(UtilsDir)\Assembly-CSharp_publicized.dll</HintPath>
+        </Reference>
+        <Reference Include="assembly_googleanalytics">
+            <HintPath>$(UtilsDir)\assembly_googleanalytics_publicized.dll</HintPath>
+        </Reference>
+        <Reference Include="assembly_guiutils">
+            <HintPath>$(UtilsDir)\assembly_guiutils_publicized.dll</HintPath>
+        </Reference>
+        <Reference Include="assembly_lux">
+            <HintPath>$(UtilsDir)\assembly_lux_publicized.dll</HintPath>
+        </Reference>
+        <Reference Include="assembly_postprocessing">
+            <HintPath>$(UtilsDir)\assembly_postprocessing_publicized.dll</HintPath>
+        </Reference>
+        <Reference Include="assembly_sunshafts">
+            <HintPath>$(UtilsDir)\assembly_sunshafts_publicized.dll</HintPath>
+        </Reference>
+        <Reference Include="assembly_utils">
+            <HintPath>$(UtilsDir)\assembly_utils_publicized.dll</HintPath>
+        </Reference>
+        <Reference Include="assembly_valheim">
+            <HintPath>$(UtilsDir)\assembly_valheim_publicized.dll</HintPath>
+        </Reference>
+        <Reference Include="BepInEx">
+            <HintPath>$(GamePath)\BepInEx\core\BepInEx.dll</HintPath>
+        </Reference>
+        <Reference Include="com.rlabrecque.steamworks.net">
+            <HintPath>$(UtilsDir)\com.rlabrecque.steamworks.net.dll</HintPath>
+        </Reference>
+        <Reference Include="fastJSON">
+            <HintPath>$(UtilsDir)\fastJSON.dll</HintPath>
+        </Reference>
+        <Reference Include="JFUtils">
+            <HintPath>$(UtilsDir)\JFUtils.dll</HintPath>
+        </Reference>
+        <Reference Include="System"/>
+        <Reference Include="System.Core"/>
+        <Reference Include="System.Data"/>
+        <Reference Include="System.Xml"/>
+        <Reference Include="Unity.TextMeshPro">
+            <HintPath>$(GamePath)\valheim_Data\Managed\Unity.TextMeshPro.dll</HintPath>
+        </Reference>
+        <Reference Include="UnityEngine.AssetBundleModule">
+            <HintPath>$(UtilsDir)\UnityEngine\UnityEngine.AssetBundleModule.dll</HintPath>
+        </Reference>
+        <Reference Include="UnityEngine.CoreModule">
+            <HintPath>$(UtilsDir)\UnityEngine\UnityEngine.CoreModule.dll</HintPath>
+        </Reference>
+        <Reference Include="UnityEngine.InputLegacyModule">
+            <HintPath>$(UtilsDir)\UnityEngine\UnityEngine.InputLegacyModule.dll</HintPath>
+        </Reference>
+        <Reference Include="UnityEngine.UI">
+            <HintPath>$(GamePath)\valheim_Data\Managed\UnityEngine.UI.dll</HintPath>
+        </Reference>
+    </ItemGroup>
+    <ItemGroup>
+        <Compile Include="ConsoleCommands\ConsoleCommandsManager.cs"/>
+        <Compile Include="GlobalUsings.cs"/>
+        <Compile Include="Plugin.cs" />
+        <Compile Include="Properties\AssemblyInfo.cs"/>
+        <Compile Include="RecordPrefabs.cs" />
+        <Compile Include="Settings.cs" />
+        <Compile Include="Web\Controllers\AvalableCommand.cs"/>
+        <Compile Include="Web\Controllers\ExecuteCommand.cs"/>
+        <Compile Include="Web\Controllers\FindObjects\FindObjects.cs"/>
+        <Compile Include="Web\Controllers\FindObjects\FindObjectsResult.cs" />
+        <Compile Include="Web\Controllers\FindObjects\Models\ContainerData.cs" />
+        <Compile Include="Web\Controllers\FindObjects\Models\CreatureData.cs" />
+        <Compile Include="Web\Controllers\FindObjects\Models\DoorData.cs" />
+        <Compile Include="Web\Controllers\FindObjects\Models\FireplaceData.cs" />
+        <Compile Include="Web\Controllers\FindObjects\Models\ItemData.cs" />
+        <Compile Include="Web\Controllers\FindObjects\Models\ObjectData.cs" />
+        <Compile Include="Web\Controllers\FindObjects\Models\PieceData.cs" />
+        <Compile Include="Web\Controllers\FindObjects\Models\PlayerData.cs" />
+        <Compile Include="Web\Controllers\FindObjects\Models\PortalData.cs" />
+        <Compile Include="Web\Controllers\GetLog.cs"/>
+        <Compile Include="Web\Controllers\Playerdata\GetPlayerData.cs" />
+        <Compile Include="Web\Controllers\Playerdata\SetPlayerData.cs" />
+        <Compile Include="Web\Controllers\MainRoute.cs"/>
+        <Compile Include="Web\Controllers\ServerInfo.cs"/>
+        <Compile Include="Web\ControllerAttribute.cs"/>
+        <Compile Include="Web\IController.cs"/>
+        <Compile Include="Web\MessageResult.cs"/>
+        <Compile Include="Web\QueryParamInfo.cs"/>
+        <Compile Include="Web\WebApiManager.cs"/>
+        <Compile Include="Web\WebExceptionJSON.cs"/>
+    </ItemGroup>
+    <ItemGroup>
+        <Content Include="ILRepack.targets"/>
+    </ItemGroup>
+    <ItemGroup>
+        <None Include="packages.config"/>
+    </ItemGroup>
+    <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets"/>
+    <Target Name="CopyDLL" AfterTargets="ILRepack">
+        <Copy SourceFiles="$(TargetDir)$(ProjectName).dll" DestinationFolder="D:\Slava\Coding\_Publish\Frogger-$(ProjectName)"/>
+        <Copy SourceFiles="$(TargetDir)$(ProjectName).dll" DestinationFolder="D:\Steam\steamapps\common\Valheim\BepInEx\plugins"/>
+        <Copy SourceFiles="$(TargetDir)$(ProjectName).dll" DestinationFolder="D:\Steam\steamapps\common\Valheim dedicated server\BepInEx\plugins"/>
+        <Message Importance="High" Text="Copied $(ProjectName).dll to D:\Slava\Coding\_Publish\Frogger-$(ProjectName) and D:\Steam\steamapps\common\Valheim\BepInEx\plugins"/>
+    </Target>
+    <Import Project="packages\ILRepack.Lib.MSBuild.Task.2.0.31\build\ILRepack.Lib.MSBuild.Task.targets" Condition="Exists('packages\ILRepack.Lib.MSBuild.Task.2.0.31\build\ILRepack.Lib.MSBuild.Task.targets')"/>
+    <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+        <PropertyGroup>
+            <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them. For more information, see http://go.microsoft.com/fwlink/?LinkID=322105.The missing file is {0}.</ErrorText>
+        </PropertyGroup>
+        <Error Condition="!Exists('packages\ILRepack.Lib.MSBuild.Task.2.0.31\build\ILRepack.Lib.MSBuild.Task.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\ILRepack.Lib.MSBuild.Task.2.0.31\build\ILRepack.Lib.MSBuild.Task.targets'))"/>
+    </Target>
+</Project>
