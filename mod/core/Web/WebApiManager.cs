@@ -139,6 +139,12 @@ public static class WebApiManager
                 Controllers.Add(instance as IController);
             }
         }
+
+        Controllers = Controllers
+            .OrderBy(x => x.Route.Equals("/"))
+            .ThenBy(x => x.HttpMethod)
+            .ThenBy(x => x.Route.Length)
+            .ToHashSet();
     }
 
     public static void Stop()
@@ -201,8 +207,16 @@ public static class WebApiManager
         var httpMethod = request.HttpMethod;
         var absolutePath = url.AbsolutePath;
         var response = context.Response;
+        
+        if (request.HttpMethod == "OPTIONS")
+        {
+            response.AddHeader("Access-Control-Allow-Headers", "Content-Type, Accept, X-Requested-With");
+            response.AddHeader("Access-Control-Allow-Methods", "GET, POST");
+            response.AddHeader("Access-Control-Max-Age", "1728000");
+        }
+        response.AppendHeader("Access-Control-Allow-Origin", "*");
 
-        foreach (var controller in Controllers)
+        foreach (var controller in Controllers) 
             if (httpMethod == controller.HttpMethod && absolutePath == controller.Route)
             {
                 Debug($"Got {absolutePath} request, url: {url}");
