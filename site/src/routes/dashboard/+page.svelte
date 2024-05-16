@@ -1,16 +1,31 @@
 <script>
 	import { getImageLink } from '$lib/images';
 	import { Avatar } from '@skeletonlabs/skeleton';
+	import { onMount } from 'svelte';
 
 	export let data;
+	let columCount = 1;
+
+	const updateFontSize = () => {
+		if (window.innerWidth >= 1800) columCount = 5;
+		else if (window.innerWidth >= 1400) columCount = 4;
+		else if (window.innerWidth >= 1000) columCount = 3;
+		else if (window.innerWidth >= 710) columCount = 2;
+		else columCount = 1;
+	};
+	onMount(() => {
+		updateFontSize();
+		window.addEventListener('resize', updateFontSize);
+		return () => window.removeEventListener('resize', updateFontSize);
+	});
 </script>
 
 <!-- <div class="card 'bg-initial' p-4 flex justify-center items-center"><span>Minimal</span></div> -->
 {#await data.servers}
 	<div
-		class="w-full text-token grid grid-cols-1 lg:grid-cols-3 md:grid-cols-2 sm:grid-cols-1 gap-4"
+		class="w-full text-token grid gap-4 grid-cols-1 lg:grid-cols-3 md:grid-cols-2 sm:grid-cols-1"
 	>
-		{#each [1, 1] as i}
+		{#each [0, 0] as { }}
 			<div class="card 'bg-initial' card-hover overflow-hidden">
 				<header>
 					<div
@@ -36,7 +51,8 @@
 	</div>
 {:then servers}
 	<div
-		class="w-full text-token grid grid-cols-1 lg:grid-cols-3 md:grid-cols-2 sm:grid-cols-1 gap-4"
+		class={`w-full text-token grid gap-4`}
+		style={`grid-template-columns: repeat(${columCount}, minmax(0, 1fr));`}
 	>
 		{#each servers as server}
 			<a class="card 'bg-initial' card-hover overflow-hidden" href="/dashboard/{server.id}">

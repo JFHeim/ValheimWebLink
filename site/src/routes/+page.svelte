@@ -21,15 +21,10 @@
 			}
 		};
 
-		// Initial font size adjustment
 		updateFontSize();
-
-		// Font size adjustment on window resize
 		window.addEventListener('resize', updateFontSize);
 
-		return () => {
-			window.removeEventListener('resize', updateFontSize);
-		};
+		return () => window.removeEventListener('resize', updateFontSize);
 	});
 </script>
 

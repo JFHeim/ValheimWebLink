@@ -39,12 +39,14 @@
 </div>
 <AppBar>
 	<svelte:fragment slot="lead">
-		<a href="/" class="btn btn-sm variant-filled"> Home </a>
+		<a href="/" class="btn btn-sm variant-filled" data-sveltekit-preload-data> Home </a>
 	</svelte:fragment>
 
 	<svelte:fragment slot="trail">
 		{#if $page.url.pathname !== '/dashboard'}
-			<a href="/dashboard" class="btn btn-sm variant-filled"> Dashboard </a>
+			<a href="/dashboard" class="btn btn-sm variant-filled" data-sveltekit-preload-data>
+				Dashboard
+			</a>
 		{/if}
 	</svelte:fragment>
 </AppBar>

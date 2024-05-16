@@ -1,5 +1,4 @@
 <script>
-	export let data;
-
-	console.log(data.serverId);
 </script>
+
+<h2>hello</h2>
