@@ -1,5 +1,7 @@
 ﻿using BepInEx.Bootstrap;
 
+#nullable enable
+
 namespace ValheimWebLink.Web.Controllers;
 
 [Controller]
@@ -24,6 +26,9 @@ file struct ServerInfoData
     public string name;
     public string version;
     public int worldSeed;
+    public string? time;
+    public int? day;
+    public string? timeOfDay;
     public int playersCount;
     public string[] players;
     public string[] globalKeys;
@@ -35,6 +40,14 @@ file struct ServerInfoData
     {
         var name = ZNet.m_ServerName;
         var version = Version.GetVersionString();
+        var time = TimeUtils.GetCurrentTimeValue();
+        double timeSeconds = ZNet.instance?.GetTimeSeconds() ?? 0;
+        var day = EnvMan.instance?.GetDay(timeSeconds - (EnvMan.instance?.m_dayLengthSec ?? 0) * 0.15000000596046448) ?? null;
+        TimeOfDay? timeOfDay = null;
+        if (EnvMan.IsDay()) timeOfDay = TimeOfDay.Day;
+        else if (EnvMan.IsDaylight()) timeOfDay = TimeOfDay.Daylight;
+        else if (EnvMan.IsAfternoon()) timeOfDay = TimeOfDay.Afternoon;
+        else if (EnvMan.IsNight()) timeOfDay = TimeOfDay.Night;
         var worldSeed = WorldGenerator.instance?.m_world?.m_seed ?? default;
         var playersCount = ZNet.instance?.GetNrOfPlayers() ?? 0;
         var players = ZNet.instance?.GetPlayerList().Select(x => x.m_name).ToArray() ?? [];
@@ -48,6 +61,9 @@ file struct ServerInfoData
             name = name,
             version = version,
             worldSeed = worldSeed,
+            time = time.Item1 == -1 ? null : $"{time.Item1}:{time.Item2}",
+            day = day,
+            timeOfDay = timeOfDay.ToString(),
             playersCount = playersCount,
             players = players,
             globalKeys = globalKeys,
@@ -56,4 +72,12 @@ file struct ServerInfoData
             mods = mods
         };
     }
+}
+
+file enum TimeOfDay
+{
+    Day,
+    Daylight,
+    Afternoon,
+    Night
 }

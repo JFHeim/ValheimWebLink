@@ -15,6 +15,7 @@
 	let refreshing = false;
 	let bossesOpen = false;
 	let modsOpen = false;
+	let serverOffline = false;
 
 	counter.subscribe((value) => {
 		serverUrl = value.serverUrl;
@@ -77,8 +78,57 @@
 		{:then json}
 			{setServerInfo(json)}
 		{:catch error}
-			{@debug error}
-			<p>Error: {error.message}</p>
+			{#if error.message == 'Failed to fetch' || error.message == 'TIMEOUT'}
+				<aside class="alert variant-filled-warning mt-5" style="max-width: 400px;">
+					<i class="fa-solid fa-triangle-exclamation text-4xl"></i>
+					<div class="alert-message" data-toc-ignore>
+						<h3 class="h3" data-toc-ignore>Warning</h3>
+						<p>Server is offline or unreachable</p>
+					</div>
+					<div class="alert-actions">
+						<button
+							class="btn variant-filled-secondary"
+							style="padding-left: 10px;"
+							on:click={() => {
+								refreshing = true;
+								serverInfo = null;
+								serverInfoPromise = data.getServerInfo;
+							}}
+						>
+							<i class="fa-solid fa-refresh"></i>
+							<p>Try again</p>
+						</button>
+					</div>
+				</aside>
+				<div class="hidden">
+					{(serverOffline = true)}
+				</div>
+			{:else}
+				<aside class="alert variant-filled-error mt-5">
+					<i class="fa-solid fa-triangle-exclamation text-4xl"></i>
+					<div class="alert-message" data-toc-ignore>
+						<h3 class="h3" data-toc-ignore>Error</h3>
+						<p>{error.message}</p>
+					</div>
+					<div class="alert-actions">
+						<button
+							class="btn variant-filled-secondary"
+							style="padding-left: 10px;"
+							on:click={() => {
+								refreshing = true;
+								serverInfo = null;
+								serverInfoPromise = data.getServerInfo;
+							}}
+						>
+							<i class="fa-solid fa-refresh"></i>
+							<p>Try again</p>
+						</button>
+					</div>
+				</aside>
+				<div class="hidden">
+					{(serverOffline = true)}
+				</div>
+			{/if}
 		{/await}
 	{/if}
 {/if}
@@ -88,7 +138,9 @@
 		<div class="flex flex-row" style="align-items: flex-start;">
 			<div>
 				<header class="card-header h2" style="padding-top: 3px;">
-					Manage <span class="t-bold">{serverInfo.name}</span>
+					Manage <span class="t-bold"
+						>{serverInfo.name === '' ? 'Your Server' : serverInfo.name}</span
+					>
 					<br />
 					<hr />
 				</header>
@@ -132,8 +184,15 @@
 					{/if}
 					<div class="pb-1"></div>
 
-					<li class="pl-4">Server time: <span class="t-bold">{serverInfo.time}</span></li>
-					<li class="pl-4">Server day: <span class="t-bold">{serverInfo.day}</span></li>
+					{#if serverInfo.time}
+						<li class="pl-4">Server time: <span class="t-bold">{serverInfo.time}</span></li>
+					{/if}
+					{#if serverInfo.day}
+						<li class="pl-4">Server day: <span class="t-bold">{serverInfo.day}</span></li>
+					{/if}
+					{#if serverInfo.timeOfDay}
+						<li class="pl-4">It's <span class="t-bold">{serverInfo.timeOfDay}</span> on server</li>
+					{/if}
 
 					<div class="pb-2"></div>
 					<li class="pl-4">
@@ -189,14 +248,14 @@
 			</button>
 		</div>
 	</div>
-{:else}
+{:else if serverInfo === false}
 	<header class="card-header h2" style="padding-top: 3px;">
 		<div class="placeholder"></div>
 		<br />
 		<hr />
 	</header>
 
-	<h3 class="h3 card-header mb-2 placeholder"></h3>
+	<div class="h3 card-header mb-2 placeholder"></div>
 
 	<ul>
 		<div class="placeholder"></div>
