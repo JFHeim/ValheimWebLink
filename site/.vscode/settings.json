@@ -130,5 +130,6 @@
 		"**/packages": true,
 		"**/packages.config": true,
 		"**/node_modules": true
-	}
+	},
+	"cSpell.words": ["skeletonlabs"]
 }
