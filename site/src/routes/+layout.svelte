@@ -29,6 +29,9 @@
 	import { BiCube, BiWorld } from 'svelte-icons-pack/bi';
 	storePopup.set({ computePosition, autoUpdate, flip, shift, offset, arrow });
 
+	import { initializeStores, Toast } from '@skeletonlabs/skeleton';
+	initializeStores();
+
 	// Font Awesome
 	import '@fortawesome/fontawesome-free/css/fontawesome.css';
 	import '@fortawesome/fontawesome-free/css/brands.css';
@@ -63,6 +66,8 @@
 		counter.set_railId(railId);
 	}
 </script>
+
+<Toast />
 
 <!-- TODO: checkAppRail on route change, not on click -->
 <svelte:window on:resize={checkAppRail} on:keydown={checkAppRail} on:click={checkAppRail} />
@@ -121,7 +126,7 @@
 			</AppRailTile>
 		</AppRail>
 	{/if}
-	<div class="limited-content-screen">
+	<div class="limited-content-screen w-fit-avaliable">
 		<div class="px-4 py-2">
 			<slot />
 		</div>

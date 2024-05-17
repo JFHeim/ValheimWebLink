@@ -3,8 +3,6 @@
 	import { goto } from '$app/navigation';
 	import { counter } from '$lib/counter';
 
-	export const ssr = false;
-
 	counter.subscribe((data) => {
 		const { railId, serverUrl } = data;
 		if (railId != null)

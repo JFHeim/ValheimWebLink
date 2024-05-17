@@ -78,7 +78,7 @@
 	};
 </script>
 
-<label class="label">
+<label class="label centered-rl w-fit">
 	<p class="w-fit centered-rl">Search</p>
 	<div class="w-fit centered-rl flex flex-row gap-2">
 		<div class="centered-rl input-group input-group-divider flex limited">
