@@ -94,36 +94,42 @@
         <Reference Include="UnityEngine.CoreModule">
             <HintPath>$(UtilsDir)\UnityEngine\UnityEngine.CoreModule.dll</HintPath>
         </Reference>
+        <Reference Include="UnityEngine.ImageConversionModule">
+            <HintPath>..\..\..\Utils\UnityEngine\UnityEngine.ImageConversionModule.dll</HintPath>
+        </Reference>
         <Reference Include="UnityEngine.InputLegacyModule">
             <HintPath>$(UtilsDir)\UnityEngine\UnityEngine.InputLegacyModule.dll</HintPath>
         </Reference>
         <Reference Include="UnityEngine.UI">
             <HintPath>$(GamePath)\valheim_Data\Managed\UnityEngine.UI.dll</HintPath>
         </Reference>
+        <Reference Include="websocket-sharp">
+            <HintPath>..\..\..\Utils\websocket-sharp.dll</HintPath>
+        </Reference>
     </ItemGroup>
     <ItemGroup>
         <Compile Include="ConsoleCommands\ConsoleCommandsManager.cs"/>
         <Compile Include="GlobalUsings.cs"/>
-        <Compile Include="Plugin.cs" />
+        <Compile Include="Plugin.cs"/>
         <Compile Include="Properties\AssemblyInfo.cs"/>
-        <Compile Include="RecordPrefabs.cs" />
-        <Compile Include="Settings.cs" />
+        <Compile Include="RecordPrefabs.cs"/>
+        <Compile Include="Settings.cs"/>
         <Compile Include="Web\Controllers\AvalableCommand.cs"/>
         <Compile Include="Web\Controllers\ExecuteCommand.cs"/>
         <Compile Include="Web\Controllers\FindObjects\FindObjects.cs"/>
-        <Compile Include="Web\Controllers\FindObjects\FindObjectsResult.cs" />
-        <Compile Include="Web\Controllers\FindObjects\Models\ContainerData.cs" />
-        <Compile Include="Web\Controllers\FindObjects\Models\CreatureData.cs" />
-        <Compile Include="Web\Controllers\FindObjects\Models\DoorData.cs" />
-        <Compile Include="Web\Controllers\FindObjects\Models\FireplaceData.cs" />
-        <Compile Include="Web\Controllers\FindObjects\Models\ItemData.cs" />
-        <Compile Include="Web\Controllers\FindObjects\Models\ObjectData.cs" />
-        <Compile Include="Web\Controllers\FindObjects\Models\PieceData.cs" />
-        <Compile Include="Web\Controllers\FindObjects\Models\PlayerData.cs" />
-        <Compile Include="Web\Controllers\FindObjects\Models\PortalData.cs" />
+        <Compile Include="Web\Controllers\FindObjects\FindObjectsResult.cs"/>
+        <Compile Include="Web\Controllers\FindObjects\Models\ContainerData.cs"/>
+        <Compile Include="Web\Controllers\FindObjects\Models\CreatureData.cs"/>
+        <Compile Include="Web\Controllers\FindObjects\Models\DoorData.cs"/>
+        <Compile Include="Web\Controllers\FindObjects\Models\FireplaceData.cs"/>
+        <Compile Include="Web\Controllers\FindObjects\Models\ItemData.cs"/>
+        <Compile Include="Web\Controllers\FindObjects\Models\ObjectData.cs"/>
+        <Compile Include="Web\Controllers\FindObjects\Models\PieceData.cs"/>
+        <Compile Include="Web\Controllers\FindObjects\Models\PlayerData.cs"/>
+        <Compile Include="Web\Controllers\FindObjects\Models\PortalData.cs"/>
         <Compile Include="Web\Controllers\GetLog.cs"/>
-        <Compile Include="Web\Controllers\Playerdata\GetPlayerData.cs" />
-        <Compile Include="Web\Controllers\Playerdata\SetPlayerData.cs" />
+        <Compile Include="Web\Controllers\Playerdata\GetPlayerData.cs"/>
+        <Compile Include="Web\Controllers\Playerdata\SetPlayerData.cs"/>
         <Compile Include="Web\Controllers\MainRoute.cs"/>
         <Compile Include="Web\Controllers\ServerInfo.cs"/>
         <Compile Include="Web\ControllerAttribute.cs"/>
@@ -138,6 +144,9 @@
     </ItemGroup>
     <ItemGroup>
         <None Include="packages.config"/>
+    </ItemGroup>
+    <ItemGroup>
+        <Folder Include="Web\Controllers\PlayerEye\"/>
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets"/>
     <Target Name="CopyDLL" AfterTargets="ILRepack">

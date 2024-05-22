@@ -10,9 +10,10 @@ public class ServerInfo : IController
     public string Route => "/serverinfo";
     public string HttpMethod => "GET";
     public string Description => "Returns vast server info";
-    public List<QueryParamInfo> QueryParameters => [];
+    public List<QueryParamInfo> QueryParameters => []; //TODO: info with auth
+    public bool RequiresAuth => false;
 
-    public Task HandleRequest(HttpListenerRequest request, HttpListenerResponse response, bool isAuthed,
+    public Task HandleRequest(HttpListenerRequest request, HttpListenerResponse response,
         Dictionary<string, string> queryParameters)
     {
         WebApiManager.SendResponce(response, 200, "application/json", ServerInfoData.Create());
@@ -32,8 +33,11 @@ file struct ServerInfoData
     public int playersCount;
     public string[] players;
     public string[] globalKeys;
-    public string[] adminList;
+    
+    //TODO: only with auth
+    public string[] adminList; 
     public string[] banList;
+    
     public string[] mods;
 
     public static ServerInfoData Create()
@@ -42,7 +46,8 @@ file struct ServerInfoData
         var version = Version.GetVersionString();
         var time = TimeUtils.GetCurrentTimeValue();
         double timeSeconds = ZNet.instance?.GetTimeSeconds() ?? 0;
-        var day = EnvMan.instance?.GetDay(timeSeconds - (EnvMan.instance?.m_dayLengthSec ?? 0) * 0.15000000596046448) ?? null;
+        var day = EnvMan.instance?.GetDay(timeSeconds - (EnvMan.instance?.m_dayLengthSec ?? 0) * 0.15000000596046448)
+                  ?? null;
         TimeOfDay? timeOfDay = null;
         if (EnvMan.IsDay()) timeOfDay = TimeOfDay.Day;
         else if (EnvMan.IsDaylight()) timeOfDay = TimeOfDay.Daylight;

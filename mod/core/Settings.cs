@@ -1,4 +1,5 @@
 ﻿using BepInEx;
+using UnityEngine.Serialization;
 using ValheimWebLink.Web;
 
 namespace ValheimWebLink;
@@ -78,5 +79,6 @@ public static class SettingsManager
 [Serializable]
 public class Settings
 {
-    public int port = 8080;
+    public int httpPort = 8080;
+    public int wsPort => httpPort + 1;
 }

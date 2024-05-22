@@ -60,8 +60,8 @@
 
 {#if serverUrl && serverInfo == null}
 	{#if serverUrl == 'null' || serverInfoPromise == null}
-		<aside class="alert variant-filled-warning mt-5">
-			<i class="fa-solid fa-triangle-exclamation text-4xl"></i>
+		<aside class="mt-5 alert variant-filled-warning">
+			<i class="text-4xl fa-solid fa-triangle-exclamation"></i>
 			<div class="alert-message" data-toc-ignore>
 				<h3 class="h3" data-toc-ignore>Warning</h3>
 				<p>No server info provided</p>
@@ -79,33 +79,35 @@
 			{setServerInfo(json)}
 		{:catch error}
 			{#if error.message == 'Failed to fetch' || error.message == 'TIMEOUT'}
-				<aside class="alert variant-filled-warning mt-5" style="max-width: 400px;">
-					<i class="fa-solid fa-triangle-exclamation text-4xl"></i>
-					<div class="alert-message" data-toc-ignore>
-						<h3 class="h3" data-toc-ignore>Warning</h3>
-						<p>Server is offline or unreachable</p>
+				<div class="flex flex-col align-items-center">
+					<div class="h-full mt-5 alert variant-filled-warning" style="max-width: 400px;">
+						<i class="text-4xl fa-solid fa-triangle-exclamation"></i>
+						<div class="alert-message" data-toc-ignore>
+							<h3 class="h3" data-toc-ignore>Warning</h3>
+							<p>Server is offline or unreachable</p>
+						</div>
+						<div class="alert-actions">
+							<button
+								class="btn variant-filled-secondary"
+								style="padding-left: 10px;"
+								on:click={() => {
+									refreshing = true;
+									serverInfo = null;
+									serverInfoPromise = data.getServerInfo;
+								}}
+							>
+								<i class="fa-solid fa-refresh"></i>
+								<p>Try again</p>
+							</button>
+						</div>
 					</div>
-					<div class="alert-actions">
-						<button
-							class="btn variant-filled-secondary"
-							style="padding-left: 10px;"
-							on:click={() => {
-								refreshing = true;
-								serverInfo = null;
-								serverInfoPromise = data.getServerInfo;
-							}}
-						>
-							<i class="fa-solid fa-refresh"></i>
-							<p>Try again</p>
-						</button>
+					<div class="hidden">
+						{(serverOffline = true)}
 					</div>
-				</aside>
-				<div class="hidden">
-					{(serverOffline = true)}
 				</div>
 			{:else}
-				<aside class="alert variant-filled-error mt-5">
-					<i class="fa-solid fa-triangle-exclamation text-4xl"></i>
+				<aside class="mt-5 alert variant-filled-error">
+					<i class="text-4xl fa-solid fa-triangle-exclamation"></i>
 					<div class="alert-message" data-toc-ignore>
 						<h3 class="h3" data-toc-ignore>Error</h3>
 						<p>{error.message}</p>
@@ -145,10 +147,10 @@
 					<hr />
 				</header>
 
-				<h3 class="h3 card-header mb-2">General info</h3>
+				<h3 class="mb-2 h3 card-header">General info</h3>
 
 				<ul>
-					<li class="pl-4 pb-1">Game version: <span class="t-bold">{serverInfo.version}</span></li>
+					<li class="pb-1 pl-4">Game version: <span class="t-bold">{serverInfo.version}</span></li>
 					<li class="pl-4">
 						{#if serverInfo.playersCount > 0}🟢{:else}🟡{/if}
 						Online players: <span class="t-bold"> {serverInfo.playersCount}</span>
@@ -165,7 +167,7 @@
 						<li class="pl-4">🛑 Banned players:</li>
 						<ul>
 							{#each serverInfo.banList as player}
-								<li class="pl-8">- <span class="t-bold text-red-500">{player}</span></li>
+								<li class="pl-8">- <span class="text-red-500 t-bold">{player}</span></li>
 							{/each}
 						</ul>
 					{:else}
@@ -255,7 +257,7 @@
 		<hr />
 	</header>
 
-	<div class="h3 card-header mb-2 placeholder"></div>
+	<div class="mb-2 h3 card-header placeholder"></div>
 
 	<ul>
 		<div class="placeholder"></div>

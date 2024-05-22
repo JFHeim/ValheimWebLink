@@ -6,6 +6,7 @@ public struct QueryParamInfo
     public string name;
     public string type;
     public string description;
+    //TODO: Add isRequired flag and because of that add default value
 
     public QueryParamInfo(string name, string type, string description)
     {

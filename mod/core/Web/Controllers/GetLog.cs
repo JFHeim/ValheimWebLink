@@ -9,14 +9,16 @@ public class GetLog : IController
     public string HttpMethod => "GET";
     public string Description => "Returns logs from the log file";
     public List<QueryParamInfo> QueryParameters => [];
+    public bool RequiresAuth => true;
 
-    public Task HandleRequest(HttpListenerRequest request, HttpListenerResponse response, bool isAuthed,
+    public Task HandleRequest(HttpListenerRequest request, HttpListenerResponse response,
         Dictionary<string, string> queryParameters)
     {
         string responseString;
         try
         {
-            using var fileStream = File.Open(Path.Combine(Paths.BepInExRootPath, "LogOutput.log"), FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+            using var fileStream = File.Open(Path.Combine(Paths.BepInExRootPath, "LogOutput.log"), FileMode.Open,
+                FileAccess.Read, FileShare.ReadWrite);
             using var streamReader = new StreamReader(fileStream);
             responseString = streamReader.ReadToEnd();
         }

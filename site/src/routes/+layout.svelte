@@ -68,11 +68,12 @@
 </script>
 
 <Toast />
+<svelte:document title={$page.data.title} />
 
 <!-- TODO: checkAppRail on route change, not on click -->
 <svelte:window on:resize={checkAppRail} on:keydown={checkAppRail} on:click={checkAppRail} />
 
-<div class="flex-row absolute h-5 top-4 w-full flex justify-center" style="height: 0">
+<div class="absolute flex flex-row justify-center w-full h-5 top-4" style="height: 0">
 	<p class="text-xl text-center" style="width: fit-content; height: fit-content">
 		{$page.data.title}
 	</p>

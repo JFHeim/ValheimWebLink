@@ -15,17 +15,13 @@ public class FindObjects : IController
         new("radius", "float", "Radius of the search")
     ];
 
-    public async Task HandleRequest(HttpListenerRequest request, HttpListenerResponse response, bool isAuthed,
+    public bool RequiresAuth => true;
+
+    public async Task HandleRequest(HttpListenerRequest request, HttpListenerResponse response,
         Dictionary<string, string> queryParameters)
     {
         if (ZNet.instance == null || ZoneSystem.instance == null)
             WebApiManager.SendResponce(response, ServiceUnavailable, "Game is not fully loaded");
-
-        if (!isAuthed)
-        {
-            WebApiManager.SendResponce(response, Unauthorized);
-            return;
-        }
 
         if (!queryParameters.TryGetValue("centerpoint", out var centerPoint_string) || !SimpleVector2.TryParse
                 (centerPoint_string, out var center))

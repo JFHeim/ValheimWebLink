@@ -8,8 +8,8 @@
         <ProjectGuid>{1ED47FF7-4B37-46DF-9595-8F7C133A76DD}</ProjectGuid>
         <OutputType>Library</OutputType>
         <AppDesignerFolder>Properties</AppDesignerFolder>
-        <RootNamespace>VWL_WorldObjectsData</RootNamespace>
-        <AssemblyName>VWL_WorldObjectsData</AssemblyName>
+        <RootNamespace>VWL_PlayerEye</RootNamespace>
+        <AssemblyName>VWL_PlayerEye</AssemblyName>
         <TargetFrameworkVersion>v4.8.1</TargetFrameworkVersion>
         <LangVersion>preview</LangVersion>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -83,6 +83,7 @@
             <HintPath>$(UtilsDir)\JFUtils.dll</HintPath>
         </Reference>
         <Reference Include="mscorlib" />
+        <Reference Include="System.Drawing" />
         <Reference Include="Unity.TextMeshPro">
             <HintPath>D:\Steam\steamapps\common\Valheim\valheim_Data\Managed\Unity.TextMeshPro.dll</HintPath>
         </Reference>
@@ -92,8 +93,14 @@
         <Reference Include="UnityEngine.CoreModule">
             <HintPath>$(UtilsDir)\UnityEngine\UnityEngine.CoreModule.dll</HintPath>
         </Reference>
+        <Reference Include="UnityEngine.ImageConversionModule">
+          <HintPath>..\..\..\Utils\UnityEngine\UnityEngine.ImageConversionModule.dll</HintPath>
+        </Reference>
         <Reference Include="UnityEngine.InputLegacyModule">
             <HintPath>$(UtilsDir)\UnityEngine\UnityEngine.InputLegacyModule.dll</HintPath>
+        </Reference>
+        <Reference Include="UnityEngine.ScreenCaptureModule">
+          <HintPath>..\..\..\Utils\UnityEngine\UnityEngine.ScreenCaptureModule.dll</HintPath>
         </Reference>
         <Reference Include="UnityEngine.UI">
             <HintPath>D:\Steam\steamapps\common\Valheim\valheim_Data\Managed\UnityEngine.UI.dll</HintPath>
@@ -103,22 +110,32 @@
         <Reference Include="System.Core"/>
         <Reference Include="System.Data"/>
         <Reference Include="System.Xml"/>
+        <Reference Include="websocket-sharp">
+          <HintPath>..\..\..\Utils\websocket-sharp.dll</HintPath>
+        </Reference>
     </ItemGroup>
     <ItemGroup>
+        <Compile Include="ClientLogic.cs" />
+        <Compile Include="EyeData.cs" />
         <Compile Include="GlobalUsings.cs"/>
-        <Compile Include="InventoryData.cs" />
+        <Compile Include="PatchAtribute.cs" />
         <Compile Include="Patch\RegisterRPCs.cs" />
-        <Compile Include="HandlerSendPlayerInventory.cs" />
-        <Compile Include="HandlerSetPlayerData.cs" />
-        <Compile Include="PlayerData.cs" />
-        <Compile Include="WorldObjectsData.cs"/>
+        <Compile Include="PlayerEyePlugin.cs" />
         <Compile Include="Properties\AssemblyInfo.cs"/>
+        <Compile Include="ScreenApi.cs" />
+        <Compile Include="ServerLogic.cs" />
     </ItemGroup>
     <ItemGroup>
         <Content Include="ILRepack.targets"/>
     </ItemGroup>
     <ItemGroup>
       <None Include="packages.config" />
+    </ItemGroup>
+    <ItemGroup>
+      <ProjectReference Include="..\core\ValheimWebLink.csproj">
+        <Project>{02ce308d-1155-4b96-ad14-80aa60c2d79d}</Project>
+        <Name>ValheimWebLink</Name>
+      </ProjectReference>
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets"/>
 

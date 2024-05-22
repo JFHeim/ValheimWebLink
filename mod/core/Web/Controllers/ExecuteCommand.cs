@@ -13,21 +13,19 @@ public class ExecuteCommand : IController
     internal static bool executionHadError;
     public string Route => "/execute";
     public string HttpMethod => "POST";
-    public string Description => "Execute known ingame terminal command. Requires authentication. Returns logs of command execution.";
-    public List<QueryParamInfo> QueryParameters => [new("command", "string", "Command to execute")];
 
-    public Task HandleRequest(HttpListenerRequest request, HttpListenerResponse response, bool isAuthed,
+    public string Description =>
+        "Execute known ingame terminal command. Requires authentication. Returns logs of command execution.";
+
+    public List<QueryParamInfo> QueryParameters => [new("command", "string", "Command to execute")];
+    public bool RequiresAuth => true;
+
+    public Task HandleRequest(HttpListenerRequest request, HttpListenerResponse response,
         Dictionary<string, string> queryParameters)
     {
         runningCommand = false;
         executionHadError = false;
         commandLogBuilder.Clear();
-
-        if (!isAuthed)
-        {
-            WebApiManager.SendResponce(response, Unauthorized);
-            return Task.CompletedTask;
-        }
 
         string text = queryParameters.TryGetValue("command", out var command) ? command : string.Empty;
         if (text == string.Empty)
@@ -39,17 +37,17 @@ public class ExecuteCommand : IController
         string[] strArray = text.Split(' ');
         if (Terminal.commands.TryGetValue(strArray[0].ToLower(), out var consoleCommand))
         {
-            if (consoleCommand.IsValid(Console.instance))
-            {
-                runningCommand = true;
-                consoleCommand.RunAction(new(text, Console.instance));
-                runningCommand = false;
-            } else
-            {
-                var message = $"'{text.Split(' ')[0]}' is not valid in the current context.";
-                WebApiManager.SendResponce(response, BadRequest, message);
-                return Task.CompletedTask;
-            }
+            // if (consoleCommand.IsValid(Console.instance, true))
+            // {
+            //     runningCommand = true;
+            consoleCommand.RunAction(new(text, Console.instance));
+            //     runningCommand = false;
+            // } else
+            // {
+            //     var message = $"'{text.Split(' ')[0]}' is not valid in the current context.";
+            //     WebApiManager.SendResponce(response, BadRequest, message);
+            //     return Task.CompletedTask;
+            // }
         } else
         {
             WebApiManager.SendResponce(response, BadRequest, "Command not found");

@@ -1,41 +1,48 @@
-﻿namespace ValheimWebLink.Web.Controllers;
+﻿using UnityEngine.Serialization;
+
+namespace ValheimWebLink.Web.Controllers;
 
 [Controller]
 public class MainRoute : IController
 {
     public string Route => "/";
     public string HttpMethod => "GET";
-    public string Description => "Returns all controllers info";
+    public string Description => "Returns all routes info";
     public List<QueryParamInfo> QueryParameters => [];
+    public bool RequiresAuth => false;
 
-    public Task HandleRequest(HttpListenerRequest request, HttpListenerResponse response, bool isAuthed,
+    internal static List<RouteInfoJSON> aditionalRoutes = [];
+
+    public Task HandleRequest(HttpListenerRequest request, HttpListenerResponse response,
         Dictionary<string, string> queryParameters)
     {
         WebApiManager.SendResponce(response, OK, "application/json", new AllControllersInfo());
         return Task.CompletedTask;
     }
+
+    public static void AddRouterInfo(RouteInfoJSON info) => aditionalRoutes.Add(info);
 }
 
 [Serializable]
-file struct AllControllersInfo()
+file struct AllControllersInfo
 {
-    public ControllerInfo[] controllers = WebApiManager.Controllers.Select(ControllerInfo.FromIController).ToArray();
-}
+    public RouteInfoJSON[] routes;
 
-[Serializable]
-file struct ControllerInfo()
-{
-    public string route;
-    public string httpMethod;
-    public string description;
-    public List<QueryParamInfo> queryParameters = [];
+    public AllControllersInfo()
+    {
+        var routesList = WebApiManager.Controllers.Select(FromIController).ToList();
+        foreach (var info in MainRoute.aditionalRoutes) routesList.Add(info);
+        routes = routesList.ToArray();
+    }
 
-    public static ControllerInfo FromIController(IController controller) =>
+    private static RouteInfoJSON FromIController(IController controller) =>
         new()
         {
+            protocol = "http",
             route = controller.Route,
             httpMethod = controller.HttpMethod,
             description = controller.Description,
-            queryParameters = controller.QueryParameters
+            queryParameters = controller.QueryParameters,
+            RequiresAuth = controller.RequiresAuth
         };
 }

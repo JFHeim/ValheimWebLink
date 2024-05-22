@@ -7,10 +7,16 @@ public class AvalibleCommand : IController
     public string HttpMethod => "GET";
     public string Description => "Returns all known ingame console commands";
     public List<QueryParamInfo> QueryParameters => [];
+    public bool RequiresAuth => false;
 
-    public Task HandleRequest(HttpListenerRequest request, HttpListenerResponse response, bool isAuthed,
+    public Task HandleRequest(HttpListenerRequest request, HttpListenerResponse response,
         Dictionary<string, string> queryParameters)
     {
+        if (!ZNetScene.instance)
+        {
+            WebApiManager.SendResponce(response, ServiceUnavailable, "Game is not fully loaded");
+            return Task.CompletedTask;
+        }
         WebApiManager.SendResponce(response, OK, "application/json", Result.Create());
         return Task.CompletedTask;
     }

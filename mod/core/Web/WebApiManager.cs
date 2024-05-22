@@ -11,10 +11,11 @@ public static class WebApiManager
     public static CancellationTokenSource _cancellationTokenSource { get; private set; }
 
     private static AuthData _authData;
+    public static HttpListener Listener => _listener;
 
     public static void ReloadPort()
     {
-        var port = SettingsManager.instance.port;
+        var port = SettingsManager.instance.httpPort;
         Debug($"Reloading Web API server on port {port}...", ConsoleColor.DarkGreen);
         _listener?.Stop();
         _listener?.Prefixes.Clear();
@@ -25,12 +26,11 @@ public static class WebApiManager
 
     public static void Init()
     {
-        var port = SettingsManager.instance.port;
+        var port = SettingsManager.instance.httpPort;
         Debug($"Starting Web API server on port {port}...");
         _listener = new HttpListener();
         _listener.Prefixes.Add($"http://*:{port}/");
         //TODO: Add https
-        _listener.Start();
 
         _cancellationTokenSource = new CancellationTokenSource();
 
@@ -123,7 +123,10 @@ public static class WebApiManager
 
     private static void FindControllers()
     {
-        foreach (var type in Assembly.GetExecutingAssembly().GetTypes())
+        List<Type> types = [];
+        foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies()) types.AddRange(assembly.GetTypes());
+
+        foreach (var type in types)
         {
             if (Attribute.IsDefined(type, typeof(ControllerAttribute)))
             {
@@ -141,9 +144,9 @@ public static class WebApiManager
         }
 
         Controllers = Controllers
-            .OrderBy(x => x.Route.Equals("/"))
+            .OrderBy(x => x.Route.Length)
             .ThenBy(x => x.HttpMethod)
-            .ThenBy(x => x.Route.Length)
+            .ThenBy(x => x.Route.Equals("/"))
             .ToHashSet();
     }
 
@@ -207,22 +210,40 @@ public static class WebApiManager
         var httpMethod = request.HttpMethod;
         var absolutePath = url.AbsolutePath;
         var response = context.Response;
-        
+
         if (request.HttpMethod == "OPTIONS")
         {
             response.AddHeader("Access-Control-Allow-Headers", "Content-Type, Accept, X-Requested-With");
             response.AddHeader("Access-Control-Allow-Methods", "GET, POST");
             response.AddHeader("Access-Control-Max-Age", "1728000");
         }
+
         response.AppendHeader("Access-Control-Allow-Origin", "*");
 
-        foreach (var controller in Controllers) 
-            if (httpMethod == controller.HttpMethod && absolutePath == controller.Route)
+        foreach (var controller in Controllers)
+            if ((httpMethod == controller.HttpMethod || controller.HttpMethod == "OPTIONS")
+                && absolutePath == controller.Route)
             {
                 Debug($"Got {absolutePath} request, url: {url}");
                 try
                 {
-                    await controller.HandleRequest(request, response, IsAuthed(request), GetQueryParameters(request));
+                    if (httpMethod == "OPTIONS")
+                    {
+                        SendResponce(response, OK, "application/json", new RouteInfoJSON(controller));
+                        break;
+                    }
+
+                    if (controller.RequiresAuth && !IsAuthed(request))
+                    {
+                        SendResponce(response, Unauthorized);
+                        break;
+                    }
+
+                    await controller.HandleRequest(request, response, GetQueryParameters(request));
+                }
+                catch (NotImplementedException)
+                {
+                    SendResponce(response, NotImplemented);
                 }
                 catch (Exception e)
                 {
@@ -239,6 +260,7 @@ public static class WebApiManager
             SendResponce(response, MethodNotAllowed);
             return;
         }
+
 
         SendResponce(response, BadRequest);
         response.Close();
@@ -327,16 +349,38 @@ public static class WebApiManager
 
     public static void SendResponce(HttpListenerResponse response, HttpStatusCode status, string message) =>
         SendResponce(response, status, "text/plain", message);
+
+    public static void AddRouterInfo(RouteInfoJSON info) => MainRoute.AddRouterInfo(info);
 }
 
-public class AuthData
+[Serializable]
+public class RouteInfoJSON()
+{
+    public string route;
+    public string protocol;
+    public string httpMethod;
+    public string description;
+    public bool RequiresAuth;
+    public List<QueryParamInfo> queryParameters;
+
+    public RouteInfoJSON(IController controller) : this()
+    {
+        protocol = "http";
+        route = controller.Route;
+        httpMethod = controller.HttpMethod;
+        description = controller.Description;
+        queryParameters = controller.QueryParameters;
+        RequiresAuth = controller.RequiresAuth;
+    }
+}
+
+[Serializable]
+public class AuthData()
 {
     public string login;
     public string password;
 
-    public AuthData() { }
-
-    public AuthData(string login, string password)
+    public AuthData(string login, string password) : this()
     {
         this.login = login;
         this.password = password;

@@ -75,7 +75,6 @@ public static class ConsoleCommandsManager
             Debug("");
             Debug("Available requests:");
             Debug("GET / - returns help info with all available requests");
-            Debug("GET /serverinfo - returns lots of information about the server");
             Debug("");
             Debug("Info:");
             Debug("Discord: @justafrogger");
@@ -98,7 +97,7 @@ public static class ConsoleCommandsManager
 
         if (input.Equals("getport"))
         {
-            Debug($"Port={SettingsManager.instance.port}");
+            Debug($"Port={SettingsManager.instance.httpPort}");
             return;
         }
 

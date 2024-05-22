@@ -12,16 +12,11 @@ public class GetPlayerData : IController
         "Returns detail information about the player. Requires authentication. To get more data about the player, install WorldObjectsData module.";
 
     public List<QueryParamInfo> QueryParameters => [new("name", "string", "Name of the player")];
+    public bool RequiresAuth => true;
 
-    public async Task HandleRequest(HttpListenerRequest request, HttpListenerResponse response, bool isAuthed,
+    public async Task HandleRequest(HttpListenerRequest request, HttpListenerResponse response,
         Dictionary<string, string> queryParameters)
     {
-        if (!isAuthed)
-        {
-            WebApiManager.SendResponce(response, Unauthorized);
-            return;
-        }
-
         if (!queryParameters.TryGetValue("name", out var name))
         {
             WebApiManager.SendResponce(response, BadRequest, "Missing name parameter");
