@@ -18,10 +18,10 @@ public class ExecuteCommand : IController
         "Execute known ingame terminal command. Requires authentication. Returns logs of command execution.";
 
     public List<QueryParamInfo> QueryParameters => [new("command", "string", "Command to execute")];
-    public bool RequiresAuth => true;
+    public List<Permission> RequiredPermissions => [Permission.CommandExecute];
 
     public Task HandleRequest(HttpListenerRequest request, HttpListenerResponse response,
-        Dictionary<string, string> queryParameters)
+        Dictionary<string, string> queryParameters, List<Permission> userPermissions)
     {
         runningCommand = false;
         executionHadError = false;

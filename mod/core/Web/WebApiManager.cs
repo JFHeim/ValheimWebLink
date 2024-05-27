@@ -8,22 +8,7 @@ public static class WebApiManager
     public static HashSet<IController> Controllers { get; private set; } = [];
     private static HttpListener _listener;
     public static CancellationTokenSource _cancellationTokenSource { get; private set; }
-
-    private static AuthData _authData;
     public static HttpListener Listener => _listener;
-
-    // public static readonly IPAddress IP = GetLocalIP();
-
-    public static void ReloadPort()
-    {
-        var port = SettingsManager.instance.httpPort;
-        Debug($"Reloading Web API server on port {port}...", ConsoleColor.DarkGreen);
-        _listener?.Stop();
-        _listener?.Prefixes.Clear();
-        _listener?.Prefixes.Add($"http://*:{port}/");
-        _listener?.Start();
-        Debug($"Web API server on port {port} reloaded", ConsoleColor.Green);
-    }
 
     public static void Init()
     {
@@ -39,86 +24,9 @@ public static class WebApiManager
 
         FindControllers();
 
-        var authData = new AuthData("root", "root");
-        try
-        {
-            _authData = JSON.ToObject<AuthData>(File.ReadAllText("auth.json"));
-            if (_authData == null)
-            {
-                File.WriteAllText("auth.json", JSON.ToNiceJSON(authData));
-                Debug("\nYour login and password are default. You MUST edit it before running the server\n",
-                    ConsoleColor.Red);
-            } else
-            {
-                if (_authData.login == "root" || _authData.password == "root")
-                {
-                    Debug("\nYour login and password are default. You MUST edit it before running the server\n",
-                        ConsoleColor.Red);
-                }
-
-                if (!_authData.login.IsGood())
-                {
-                    Debug("\nYour login is in invalid format. Change it. Aborting...\n", ConsoleColor.Red);
-                    Stop();
-                }
-
-                if (!_authData.password.IsGood())
-                {
-                    Debug("\nYour password is in invalid format. Change it. Aborting...\n", ConsoleColor.Red);
-                    Stop();
-                }
-            }
-        }
-        catch (Exception e)
-        {
-            File.WriteAllText("auth.json", JSON.ToNiceJSON(authData));
-            Debug("\nYour auth.json file is corrupted and will be rewritten with default values.\n"
-                  + "You MUST edit it before running the server.\n"
-                  + $"Exeption: {e.GetType().Name} {e.Message}\n\n",
-                ConsoleColor.Red);
-
-            _authData = authData;
-        }
-
-        SetupAuthDataWatcher();
-
         var listenerThread = new Thread(() => Listen(_cancellationTokenSource.Token));
         listenerThread.IsBackground = true;
         listenerThread.Start();
-    }
-
-    private static void SetupAuthDataWatcher()
-    {
-        if (!File.Exists("auth.json"))
-        {
-            Debug("This can not happen");
-            return;
-        }
-
-        FileSystemWatcher fileSystemWatcher = new FileSystemWatcher(Paths.GameRootPath, "auth.json");
-        fileSystemWatcher.Changed += (_, _) =>
-        {
-            try
-            {
-                var authData = JSON.ToObject<AuthData>(File.ReadAllText("auth.json"));
-                if (authData == null)
-                {
-                    Debug("Looks like your auth file is corrupted. Changes will be ignored", ConsoleColor.Red);
-                    return;
-                }
-
-                _authData = authData;
-            }
-            catch (Exception exception)
-            {
-                Debug("Your auth file is corrupted. Changes will be ignored"
-                      + $"Exeption: {exception.GetType().Name} {exception.Message}",
-                    ConsoleColor.Red);
-            }
-        };
-        fileSystemWatcher.IncludeSubdirectories = true;
-        fileSystemWatcher.SynchronizingObject = ThreadingHelper.SynchronizingObject;
-        fileSystemWatcher.EnableRaisingEvents = true;
     }
 
     private static void FindControllers()
@@ -233,13 +141,14 @@ public static class WebApiManager
                         break;
                     }
 
-                    if (controller.RequiresAuth && !IsAuthed(request))
+                    var isAuthed = IsAuthed(request, controller.RequiredPermissions, out var user);
+                    if (!isAuthed)
                     {
                         SendResponce(response, Unauthorized);
                         break;
                     }
 
-                    await controller.HandleRequest(request, response, GetQueryParameters(request));
+                    await controller.HandleRequest(request, response, GetQueryParameters(request), user.permissions);
                 }
                 catch (NotImplementedException)
                 {
@@ -266,9 +175,10 @@ public static class WebApiManager
         response.Close();
     }
 
-    public static bool IsAuthed(HttpListenerRequest request)
+    public static bool IsAuthed(HttpListenerRequest request, List<Permission> permissions, out User user)
     {
-        if (_authData == null)
+        user = null;
+        if (AuthDataManager.instance == null)
         {
             Debug("AuthData is null", ConsoleColor.Red);
             return false;
@@ -278,10 +188,11 @@ public static class WebApiManager
         if (!authHeader.IsGood()) return false;
         var authData = ExtractUsernameAndPassword(authHeader);
 
-        return authData.login == _authData.login && authData.password == _authData.password;
+        user = AuthDataManager.GetUser(authData.username);
+        return AuthDataManager.IsAuthed(authData.username, authData.password, permissions);
     }
 
-    private static AuthData ExtractUsernameAndPassword(string authHeader)
+    private static (string username, string password) ExtractUsernameAndPassword(string authHeader)
     {
         string encodedUsernamePassword = authHeader.Substring("Basic ".Length).Trim();
         Encoding encoding = Encoding.GetEncoding("iso-8859-1");
@@ -360,8 +271,8 @@ public class RouteInfoJSON()
     public string protocol;
     public string httpMethod;
     public string description;
-    public bool RequiresAuth;
     public List<QueryParamInfo> queryParameters;
+    public List<Permission> RequiredPermissions;
 
     public RouteInfoJSON(IController controller) : this()
     {
@@ -370,19 +281,6 @@ public class RouteInfoJSON()
         httpMethod = controller.HttpMethod;
         description = controller.Description;
         queryParameters = controller.QueryParameters;
-        RequiresAuth = controller.RequiresAuth;
-    }
-}
-
-[Serializable]
-public class AuthData()
-{
-    public string login;
-    public string password;
-
-    public AuthData(string login, string password) : this()
-    {
-        this.login = login;
-        this.password = password;
+        RequiredPermissions = controller.RequiredPermissions;
     }
 }

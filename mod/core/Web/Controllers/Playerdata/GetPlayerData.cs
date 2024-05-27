@@ -12,10 +12,11 @@ public class GetPlayerData : IController
         "Returns detail information about the player. Requires authentication. To get more data about the player, install WorldObjectsData module.";
 
     public List<QueryParamInfo> QueryParameters => [new("name", "string", "Name of the player")];
-    public bool RequiresAuth => true;
+
+    public List<Permission> RequiredPermissions => [Permission.READ_objects];
 
     public async Task HandleRequest(HttpListenerRequest request, HttpListenerResponse response,
-        Dictionary<string, string> queryParameters)
+        Dictionary<string, string> queryParameters, List<Permission> userPermissions)
     {
         if (!queryParameters.TryGetValue("name", out var name))
         {

@@ -14,7 +14,7 @@
 					goto('/dashboard');
 					break;
 				case 1:
-					goto(`/dashboard/${serverUrl}/${loginData.username}`);
+					goto(`/dashboard/${serverUrl}/`);
 					break;
 				// 	case 2:
 				// 		goto(`/dashboard/${serverUrl}/worlds/`);

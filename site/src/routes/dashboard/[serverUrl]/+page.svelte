@@ -1,143 +1,296 @@
 <script>
-	import { counter } from '$lib/counter.js';
-
+	import { TreeView, TreeViewItem, RecursiveTreeView } from '@skeletonlabs/skeleton';
+	import { page } from '$app/stores';
+	import { counter } from '$lib/counter';
+	import { onMount } from 'svelte';
 	export let data;
-	/**@type {boolean | null}*/
-	let checking = null;
-	/** @type {{} | null}}*/
-	let loginData = null;
-	let loginErrorMsg = null;
-	let passwordErrorMsg = null;
-
-	const startLogin = async () => {
-		let formData = {
-			// @ts-ignore
-			login: document.getElementsByName('login')[0].value,
-			// @ts-ignore
-			password: document.getElementsByName('password')[0].value
-		};
-		console.log(formData);
-
-		loginErrorMsg = null;
-		passwordErrorMsg = null;
-
-		if (!formData.login) {
-			loginErrorMsg = 'ip is required';
-			return;
-		}
-		if (!formData.password) {
-			passwordErrorMsg = 'port is required';
-			return;
-		}
-
-		console.log(formData);
-
-		checking = true;
-		const result = await data.checkLogin(formData);
-		loginData = result.loginData;
-		console.log({ loginData });
-
-		if (loginData) {
-			checking = false;
-			counter.set_loginData(loginData);
-			counter.set_railId(1);
-			console.log('Successfully logged in');
-		}
+	const init = () => {
+		counter.set_railId(1);
+		counter.set_serverUrl($page.params.serverUrl);
 	};
+
+	let serverUrl = '';
+	let serverInfoPromise = null;
+	let serverInfo = null;
+	let refreshing = false;
+	let bossesOpen = false;
+	let modsOpen = false;
+	let serverOffline = false;
+
+	counter.subscribe((value) => {
+		serverUrl = value.serverUrl;
+		if (serverUrl != null) serverInfoPromise = data.getServerInfo;
+	});
+
+	const setServerInfo = (json) => {
+		serverInfo = JSON.parse(JSON.stringify(json, null, 2)).result;
+		console.log('Set server info', serverInfo);
+		serverInfo.bosses = serverInfo.globalKeys
+			.filter((key) => key.includes('defeated_'))
+			.map((key) => key.replace('defeated_', ''))
+			.map((key) => key.charAt(0).toUpperCase() + key.slice(1));
+		counter.set_serverInfo(serverInfo);
+		// console.log('Set server info', serverInfo);
+		document.title = `Dashboard | ${serverInfo.name} | Valheim Web Link`;
+		data.title = `Dashboard | ${serverInfo.name}`;
+	};
+
+	onMount(async () => {
+		init();
+
+		const interval = setInterval(async () => {
+			refreshing = true;
+			setServerInfo(await serverInfoPromise(serverUrl));
+		}, 5000);
+
+		return () => clearInterval(interval);
+	});
+	import { getToastStore } from '@skeletonlabs/skeleton';
+	const toastStore = getToastStore();
+
+	$: {
+		if (refreshing === true && serverInfo) {
+			toastStore.trigger({
+				message: '✔ Refreshed',
+				hideDismiss: true,
+				timeout: 1000
+			});
+		}
+	}
 </script>
 
-{#if checking === true}
-	<p>Checking...</p>
-{:else if checking === false}
-	{#if !loginData}
+{#if serverUrl && serverInfo == null}
+	{#if serverUrl == 'null' || serverInfoPromise == null}
 		<aside class="mt-5 alert variant-filled-warning">
 			<i class="text-4xl fa-solid fa-triangle-exclamation"></i>
 			<div class="alert-message" data-toc-ignore>
 				<h3 class="h3" data-toc-ignore>Warning</h3>
-				<p>Server is offline or do not exist</p>
+				<p>No server info provided</p>
 			</div>
 			<div class="alert-actions">
-				<!-- <button class="btn variant-filled" on:click={triggerAction}>Action</button> -->
-				<button class="btn-icon variant-filled" on:click={() => (checking = null)}>
+				<button class="btn-icon variant-filled" on:click={() => counter.set_railId(0)}>
 					<i class="fa-solid fa-xmark"></i>
 				</button>
 			</div>
 		</aside>
+	{:else}
+		{#await serverInfoPromise(serverUrl)}
+			<!-- <p>Loading server info...</p> -->
+		{:then json}
+			{setServerInfo(json)}
+		{:catch error}
+			{#if error.message == 'Failed to fetch' || error.message == 'TIMEOUT'}
+				<div class="flex flex-col align-items-center">
+					<div class="h-full mt-5 alert variant-filled-warning" style="max-width: 400px;">
+						<i class="text-4xl fa-solid fa-triangle-exclamation"></i>
+						<div class="alert-message" data-toc-ignore>
+							<h3 class="h3" data-toc-ignore>Warning</h3>
+							<p>Server is offline or unreachable</p>
+						</div>
+						<div class="alert-actions">
+							<button
+								class="btn variant-filled-secondary"
+								style="padding-left: 10px;"
+								on:click={() => {
+									refreshing = true;
+									serverInfo = null;
+									serverInfoPromise = data.getServerInfo;
+								}}
+							>
+								<i class="fa-solid fa-refresh"></i>
+								<p>Try again</p>
+							</button>
+						</div>
+					</div>
+					<div class="hidden">
+						{(serverOffline = true)}
+					</div>
+				</div>
+			{:else}
+				<aside class="mt-5 alert variant-filled-error">
+					<i class="text-4xl fa-solid fa-triangle-exclamation"></i>
+					<div class="alert-message" data-toc-ignore>
+						<h3 class="h3" data-toc-ignore>Error</h3>
+						<p>{error.message}</p>
+					</div>
+					<div class="alert-actions">
+						<button
+							class="btn variant-filled-secondary"
+							style="padding-left: 10px;"
+							on:click={() => {
+								refreshing = true;
+								serverInfo = null;
+								serverInfoPromise = data.getServerInfo;
+							}}
+						>
+							<i class="fa-solid fa-refresh"></i>
+							<p>Try again</p>
+						</button>
+					</div>
+				</aside>
+				<div class="hidden">
+					{(serverOffline = true)}
+				</div>
+			{/if}
+		{/await}
 	{/if}
-{:else if checking === null}
-	<br />
-	<div class="pb-1" />
-	<h4 class="mb-2 h4 w-fit centered-rl">Login</h4>
-	<div class="flex flex-col gap-2 centered-rl w-fit">
-		<div>
-			<div class="flex flex-col">
-				<p class="centered"><i class="fa fa-user-circle" aria-hidden="true"></i> Username</p>
-				<div class="flex centered-rl input-group input-group-divider limited-login">
-					<input
-						name="login"
-						class=""
-						placeholder="my cool name"
-						type="text"
-						on:keyup={() => (loginErrorMsg = null)}
-					/>
-				</div>
+{/if}
+
+{#if serverInfo != null}
+	<div class="info-panel">
+		<div class="flex flex-row" style="align-items: flex-start;">
+			<div>
+				<header class="card-header h2" style="padding-top: 3px;">
+					Manage <span class="t-bold"
+						>{serverInfo.name === '' ? 'Your Server' : serverInfo.name}</span
+					>
+					<br />
+					<hr />
+				</header>
+
+				<h3 class="mb-2 h3 card-header">General info</h3>
+
+				<ul>
+					<li class="pb-1 pl-4">Game version: <span class="t-bold">{serverInfo.version}</span></li>
+					<li class="pl-4">
+						{#if serverInfo.playersCount > 0}🟢{:else}🟡{/if}
+						Online players: <span class="t-bold"> {serverInfo.playersCount}</span>
+					</li>
+					{#if serverInfo.playersCount > 0}
+						<ul>
+							{#each serverInfo.players as player}
+								<li class="pl-8">- <span class="t-bold">{player}</span></li>
+							{/each}
+						</ul>
+					{/if}
+					<div class="pb-1"></div>
+					{#if serverInfo.banList.length > 0}
+						<li class="pl-4">🛑 Banned players:</li>
+						<ul>
+							{#each serverInfo.banList as player}
+								<li class="pl-8">- <span class="text-red-500 t-bold">{player}</span></li>
+							{/each}
+						</ul>
+					{:else}
+						<li class="pl-4">💗 No banned players</li>
+					{/if}
+					<div class="pb-1"></div>
+					{#if serverInfo.adminList.length > 0}
+						<li class="pl-4">👑 Admins:</li>
+						<ul>
+							{#each serverInfo.adminList as player}
+								<li class="pl-8">- <span class="t-bold text-gold">{player}</span></li>
+							{/each}
+						</ul>
+					{:else}
+						<li class="pl-4"><span style:color="yellow">⁉ </span>No admins</li>
+					{/if}
+					<div class="pb-1"></div>
+
+					{#if serverInfo.time}
+						<li class="pl-4">Server time: <span class="t-bold">{serverInfo.time}</span></li>
+					{/if}
+					{#if serverInfo.day}
+						<li class="pl-4">Server day: <span class="t-bold">{serverInfo.day}</span></li>
+					{/if}
+					{#if serverInfo.timeOfDay}
+						<li class="pl-4">It's <span class="t-bold">{serverInfo.timeOfDay}</span> on server</li>
+					{/if}
+
+					<div class="pb-2"></div>
+					<li class="pl-4">
+						<ul>
+							<TreeView open={bossesOpen}>
+								<TreeViewItem
+									padding="p-1 w-fit pr-3 pl-2"
+									on:toggle={(event) => (bossesOpen = event.detail.open)}
+								>
+									<span style:color="grey">📜 </span>Bosses killed
+									<svelte:fragment slot="children">
+										{#each serverInfo.bosses as bossName}
+											<li class="pl-8">- <span class="t-bold">{bossName}</span></li>
+										{/each}
+									</svelte:fragment>
+								</TreeViewItem>
+							</TreeView>
+						</ul>
+					</li>
+
+					<div class="pb-2"></div>
+					<li class="pl-4">
+						<ul>
+							<TreeView>
+								<TreeViewItem
+									open={modsOpen}
+									padding="p-1 w-fit pr-3 pl-2"
+									on:toggle={(event) => (modsOpen = event.detail.open)}
+								>
+									<span style:color="grey">⚙ </span>Mods installed
+									<svelte:fragment slot="children">
+										{#each serverInfo.mods as modName}
+											<li class="pl-8">- <span class="t-bold">{modName}</span></li>
+										{/each}
+									</svelte:fragment>
+								</TreeViewItem>
+							</TreeView>
+						</ul>
+					</li>
+				</ul>
 			</div>
-			<div class="flex flex-col">
-				<p class="centered"><i class="fa fa-key" aria-hidden="true"></i> Password</p>
-				<div class="flex centered-rl input-group input-group-divider limited-login">
-					<input
-						name="password"
-						class=""
-						placeholder="12345623hashdkDTYTY$%&*%$"
-						on:keyup={() => (passwordErrorMsg = null)}
-					/>
-				</div>
-			</div>
-		</div>
-		<div class="flex flex-row justify-center">
-			<button class="pl-3 pr-3 mt-6 btn variant-filled-secondary" on:click={startLogin}>
-				<i class="fa fa-link" aria-hidden="true"></i>
-				<span> Connect</span>
+
+			<button
+				class="btn variant-filled-secondary"
+				style="padding: 10px; border-radius: 100%; margin-top: 10px;"
+				on:click={() => {
+					refreshing = true;
+					serverInfo = null;
+					serverInfoPromise = data.getServerInfo;
+				}}
+			>
+				<i class="fa-solid fa-refresh"></i>
 			</button>
 		</div>
 	</div>
+{:else if serverInfo === false}
+	<header class="card-header h2" style="padding-top: 3px;">
+		<div class="placeholder"></div>
+		<br />
+		<hr />
+	</header>
+
+	<div class="mb-2 h3 card-header placeholder"></div>
+
+	<ul>
+		<div class="placeholder"></div>
+		<div class="placeholder"></div>
+		<ul>
+			{#each [1, 1] as player}
+				<li class="pl-8">
+					<div class="placeholder"></div>
+				</li>
+			{/each}
+		</ul>
+		<div class="pb-1"></div>
+		<ul>
+			{#each [1, 1] as player}
+				<li class="pl-8">
+					<div class="placeholder"></div>
+				</li>
+			{/each}
+		</ul>
+		<div class="pb-1"></div>
+		<ul>
+			{#each [1, 1] as player}
+				<li class="pl-8">
+					<div class="placeholder"></div>
+				</li>
+			{/each}
+		</ul>
+		<div class="pb-1"></div>
+
+		<div class="placeholder"></div>
+		<div class="placeholder"></div>
+
+		<div class="pb-2"></div>
+	</ul>
 {/if}
-
-<style>
-	.limited-login {
-		@media (max-width: 1124px) {
-			max-width: 450px;
-			min-width: 450px;
-		}
-
-		@media (max-width: 930px) {
-			max-width: 350px;
-			min-width: 350px;
-		}
-
-		@media (max-width: 720px) {
-			max-width: 300px;
-			min-width: 300px;
-		}
-
-		@media (max-width: 470px) {
-			max-width: 200px;
-			min-width: 200px;
-		}
-
-		@media (min-width: 1500px) {
-			max-width: 750px;
-			min-width: 750px;
-		}
-
-		@media (min-width: 1300px) {
-			max-width: 650px;
-			min-width: 650px;
-		}
-
-		@media (min-width: 1123px) {
-			max-width: 550px;
-			min-width: 550px;
-		}
-	}
-</style>

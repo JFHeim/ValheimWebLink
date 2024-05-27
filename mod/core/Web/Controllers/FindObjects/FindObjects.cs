@@ -15,10 +15,10 @@ public class FindObjects : IController
         new("radius", "float", "Radius of the search")
     ];
 
-    public bool RequiresAuth => true;
+    public List<Permission> RequiredPermissions => [Permission.READ_objects];
 
     public async Task HandleRequest(HttpListenerRequest request, HttpListenerResponse response,
-        Dictionary<string, string> queryParameters)
+        Dictionary<string, string> queryParameters, List<Permission> userPermissions)
     {
         if (ZNet.instance == null || ZoneSystem.instance == null)
             WebApiManager.SendResponce(response, ServiceUnavailable, "Game is not fully loaded");

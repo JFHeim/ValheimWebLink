@@ -66,6 +66,8 @@ public class Plugin : BaseUnityPlugin
 
         Debug("Initializing settings...");
         SettingsManager.Init();
+        Debug("Initializing auth data...");
+        AuthDataManager.Init();
         Debug("Initializing web api...");
         WebApiManager.Init();
         Debug("Initializing console commands...");

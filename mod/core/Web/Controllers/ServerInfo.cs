@@ -11,12 +11,13 @@ public class ServerInfo : IController
     public string HttpMethod => "GET";
     public string Description => "Returns vast server info";
     public List<QueryParamInfo> QueryParameters => []; //TODO: info with auth
-    public bool RequiresAuth => false;
+
+    public List<Permission> RequiredPermissions => [Permission.READ_generalinfo];
 
     public Task HandleRequest(HttpListenerRequest request, HttpListenerResponse response,
-        Dictionary<string, string> queryParameters)
+        Dictionary<string, string> queryParameters, List<Permission> userPermissions)
     {
-        WebApiManager.SendResponce(response, 200, "application/json", ServerInfoData.Create());
+        WebApiManager.SendResponce(response, 200, "application/json", ServerInfoData.Create(userPermissions));
         return Task.CompletedTask;
     }
 }
@@ -33,14 +34,14 @@ file struct ServerInfoData
     public int playersCount;
     public string[] players;
     public string[] globalKeys;
-    
+
     //TODO: only with auth
-    public string[] adminList; 
+    public string[] adminList;
     public string[] banList;
-    
+
     public string[] mods;
 
-    public static ServerInfoData Create()
+    public static ServerInfoData Create(List<Permission> userPermissions)
     {
         var name = ZNet.m_ServerName;
         var version = Version.GetVersionString();
@@ -57,8 +58,14 @@ file struct ServerInfoData
         var playersCount = ZNet.instance?.GetNrOfPlayers() ?? 0;
         var players = ZNet.instance?.GetPlayerList().Select(x => x.m_name).ToArray() ?? [];
         var globalKeys = ZoneSystem.instance?.GetGlobalKeys().ToArray() ?? [];
-        var adminList = ZNet.instance?.m_adminList.GetList().ToArray() ?? [];
-        var banList = ZNet.instance?.m_bannedList.GetList().ToArray() ?? [];
+        string[] adminList = [];
+        if (userPermissions.Contains(Permission.READ_adminlist))
+            adminList = ZNet.instance?.m_adminList.GetList().ToArray() ?? [];
+
+        string[] banList = [];
+        if (userPermissions.Contains(Permission.READ_banlist))
+            banList = ZNet.instance?.m_bannedList.GetList().ToArray() ?? [];
+        
         var mods = Chainloader.PluginInfos.Select(x => x.Key).ToArray();
 
         return new ServerInfoData

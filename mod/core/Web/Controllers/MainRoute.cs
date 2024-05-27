@@ -7,12 +7,12 @@ public class MainRoute : IController
     public string HttpMethod => "GET";
     public string Description => "Returns all routes info";
     public List<QueryParamInfo> QueryParameters => [];
-    public bool RequiresAuth => false;
+    public List<Permission> RequiredPermissions => [];
 
     internal static List<RouteInfoJSON> aditionalRoutes = [];
 
     public Task HandleRequest(HttpListenerRequest request, HttpListenerResponse response,
-        Dictionary<string, string> queryParameters)
+        Dictionary<string, string> queryParameters, List<Permission> userPermissions)
     {
         WebApiManager.SendResponce(response, OK, "application/json", new AllControllersInfo());
         return Task.CompletedTask;
@@ -41,6 +41,6 @@ file struct AllControllersInfo
             httpMethod = controller.HttpMethod,
             description = controller.Description,
             queryParameters = controller.QueryParameters,
-            RequiresAuth = controller.RequiresAuth
+            RequiredPermissions = controller.RequiredPermissions
         };
 }

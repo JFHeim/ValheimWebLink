@@ -9,7 +9,7 @@ public class SetPlayerData : IController
     public string Description =>
         "Provides way to override player data. Requires authentication. Requires WorldObjectsData module installed.";
 
-    public bool RequiresAuth => true;
+    public List<Permission> RequiredPermissions => [Permission.WRITE_objects];
 
     public List<QueryParamInfo> QueryParameters =>
     [
@@ -18,7 +18,7 @@ public class SetPlayerData : IController
     ];
 
     public Task HandleRequest(HttpListenerRequest request, HttpListenerResponse response,
-        Dictionary<string, string> queryParameters)
+        Dictionary<string, string> queryParameters, List<Permission> userPermissions)
     {
         if (!queryParameters.TryGetValue("name", out var name))
         {

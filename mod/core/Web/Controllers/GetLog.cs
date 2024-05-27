@@ -9,10 +9,13 @@ public class GetLog : IController
     public string HttpMethod => "GET";
     public string Description => "Returns logs from the log file";
     public List<QueryParamInfo> QueryParameters => [];
+    public List<Permission> RequiredPermissions => [ Permission.READ_log ];
     public bool RequiresAuth => true;
+    
+    
 
     public Task HandleRequest(HttpListenerRequest request, HttpListenerResponse response,
-        Dictionary<string, string> queryParameters)
+        Dictionary<string, string> queryParameters, List<Permission> userPermissions)
     {
         string responseString;
         try

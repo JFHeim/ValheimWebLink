@@ -7,10 +7,10 @@ public class AvalibleCommand : IController
     public string HttpMethod => "GET";
     public string Description => "Returns all known ingame console commands";
     public List<QueryParamInfo> QueryParameters => [];
-    public bool RequiresAuth => false;
+    public List<Permission> RequiredPermissions => [];
 
     public Task HandleRequest(HttpListenerRequest request, HttpListenerResponse response,
-        Dictionary<string, string> queryParameters)
+        Dictionary<string, string> queryParameters, List<Permission> userPermissions)
     {
         if (!ZNetScene.instance)
         {

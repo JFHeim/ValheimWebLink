@@ -27,7 +27,7 @@ export function timeoutFetch(url, ms) {
  * @param {Promise<any>} promise
  * @returns {Promise<Response>}
  */
-export function timeout(promise, ms) {
+export function timeout(ms, promise) {
 	return new Promise((resolve, reject) => {
 		const timer = setTimeout(() => {
 			reject(new Error('TIMEOUT'));

@@ -131,5 +131,6 @@
 		"**/packages.config": true,
 		"**/node_modules": true
 	},
-	"cSpell.words": ["skeletonlabs"]
+	"cSpell.words": ["skeletonlabs"],
+	"explorerExclude.backup": {}
 }

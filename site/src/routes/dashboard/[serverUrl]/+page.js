@@ -1,16 +1,14 @@
+import { sendRequest } from '$lib/utils';
+
 export const load = async () => {
-	const checkLogin = async ({ login, password }) => {
-		return {
-			error: null,
-			loginData: {
-				username: login,
-				role: 'full-admin'
-			}
-		};
+	const getServerInfo = async (url) => {
+		if (!url) return null;
+		const data = await sendRequest(`${url}/serverinfo`, 500);
+		return data;
 	};
 
 	return {
-		checkLogin: checkLogin,
-		title: 'Login'
+		title: 'Dashboard',
+		getServerInfo: getServerInfo
 	};
 };

@@ -6,8 +6,8 @@ public interface IController
     public string HttpMethod { get; }
     public string Description { get; }
     public List<QueryParamInfo> QueryParameters { get; }
-    public bool RequiresAuth { get; }
+    public List<Permission> RequiredPermissions { get; }
 
     public Task HandleRequest(HttpListenerRequest request, HttpListenerResponse response,
-        Dictionary<string, string> queryParameters);
+        Dictionary<string, string> queryParameters, List<Permission> userPermissions);
 }

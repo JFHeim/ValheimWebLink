@@ -12,6 +12,6 @@ export const load = () => {
 	};
 	return {
 		isServerOnline: isServerOnline,
-		title: 'Search & Login'
+		title: 'Search for server'
 	};
 };
