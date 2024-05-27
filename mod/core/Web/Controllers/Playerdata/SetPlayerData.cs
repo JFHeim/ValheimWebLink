@@ -1,6 +1,4 @@
-﻿using ValheimWebLink.Web.Controllers.FindObjects.Models;
-
-namespace ValheimWebLink.Web.Controllers.Playerdata;
+﻿namespace ValheimWebLink.Web.Controllers.Playerdata;
 
 [Controller]
 public class SetPlayerData : IController

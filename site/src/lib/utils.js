@@ -61,8 +61,8 @@ export async function hash(input) {
  * @returns {Promise<{}>}
  */
 export async function sendRequest(url, timeout) {
-	const fetchUrl = new URL(`https://just-a-frogger.ru/redir`);
+	const fetchUrl = new URL(`https://api.just-a-frogger.ru/redir`);
 	fetchUrl.searchParams.set('urlToFetch', url);
 	fetchUrl.searchParams.set('timeout', timeout.toString());
-	return await (await timeoutFetch(fetchUrl.href, 1000)).json();
+	return await (await timeoutFetch(fetchUrl.href, timeout)).json();
 }

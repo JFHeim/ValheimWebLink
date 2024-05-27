@@ -1,6 +1,5 @@
 import express from "express";
 import { timeoutFetch } from "./utils.js";
-import { env } from "./env.js";
 import bcrypt from "bcrypt";
 import cors from "cors";
 
@@ -8,6 +7,7 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 const salt = bcrypt.genSaltSync(10);
+const port = 5555;
 
 app.get("/hash", async (req, res) => {
   let { input } = req.query;
@@ -26,6 +26,14 @@ app.get("/hash", async (req, res) => {
 app.get("/redir", async (req, res) => {
   let { urlToFetch, timeout } = req.query;
   timeout = Number(timeout) || 5000;
+
+  if (!urlToFetch) {
+    res.status(400);
+    res.json({ error: "No url provided" });
+    return;
+  }
+
+  console.log(`Got /redir ${urlToFetch} with timeout ${timeout}`);
 
   /** @type {Response} */
   let response = null;
@@ -63,6 +71,6 @@ app.get("/redir", async (req, res) => {
   }
 });
 
-app.listen(5555, null, () => {
+app.listen(port, null, () => {
   console.log(`Server running on http://localhost:${port}\n`);
 });

@@ -1,8 +1,11 @@
-﻿using BepInEx;
+﻿using System.Net.NetworkInformation;
+using System.Net.Sockets;
+using BepInEx;
 using BepInEx.Bootstrap;
 using BepInEx.Logging;
 using ValheimWebLink.ConsoleCommands;
 using ValheimWebLink.Web;
+using Ping = System.Net.NetworkInformation.Ping;
 
 namespace ValheimWebLink;
 
@@ -34,6 +37,18 @@ public class Plugin : BaseUnityPlugin
         };
 
         StartCoroutine(WaiteForFullLoad());
+    }
+
+    public static bool IsLocal(IPAddress address)
+    {
+        if (address == null) throw new ArgumentNullException(nameof(address));
+        if (address.Equals(IPAddress.Any) || address.Equals(IPAddress.Loopback)
+            && (address.Equals(IPAddress.IPv6Any) || address.Equals(IPAddress.IPv6Loopback))) return true;
+        foreach (IPAddress hostAddress in Dns.GetHostAddresses(Dns.GetHostName()))
+            if (address.Equals(hostAddress))
+                return true;
+
+        return false;
     }
 
     private IEnumerator WaiteForFullLoad()

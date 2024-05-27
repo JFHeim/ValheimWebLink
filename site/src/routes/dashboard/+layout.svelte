@@ -4,14 +4,17 @@
 	import { counter } from '$lib/counter';
 
 	counter.subscribe((data) => {
-		const { railId, serverUrl } = data;
+		const { railId, serverUrl, loginData } = data;
+
+		console.log('railId', railId, 'serverUrl', serverUrl);
+
 		if (railId != null)
 			switch (railId) {
 				case 0:
 					goto('/dashboard');
 					break;
 				case 1:
-					goto(`/dashboard/${serverUrl}/`);
+					goto(`/dashboard/${serverUrl}/${loginData.username}`);
 					break;
 				// 	case 2:
 				// 		goto(`/dashboard/${serverUrl}/worlds/`);

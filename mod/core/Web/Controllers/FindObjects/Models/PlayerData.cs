@@ -1,6 +1,6 @@
-﻿using HarmonyLib;
+﻿#nullable enable
 
-#nullable enable
+using HarmonyLib;
 
 namespace ValheimWebLink.Web.Controllers.FindObjects.Models;
 

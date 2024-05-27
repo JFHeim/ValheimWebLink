@@ -6,7 +6,7 @@
 	export let data;
 	const init = () => {
 		counter.set_railId(1);
-		counter.set_serverUrl($page.params.id);
+		counter.set_serverUrl($page.params.serverUrl);
 	};
 
 	let serverUrl = '';
@@ -23,23 +23,24 @@
 	});
 
 	const setServerInfo = (json) => {
-		serverInfo = JSON.parse(JSON.stringify(json, null, 2));
+		serverInfo = JSON.parse(JSON.stringify(json, null, 2)).result;
+		console.log('Set server info', serverInfo);
 		serverInfo.bosses = serverInfo.globalKeys
 			.filter((key) => key.includes('defeated_'))
 			.map((key) => key.replace('defeated_', ''))
 			.map((key) => key.charAt(0).toUpperCase() + key.slice(1));
 		counter.set_serverInfo(serverInfo);
-		console.log('Set server info', serverInfo);
+		// console.log('Set server info', serverInfo);
 		document.title = `Dashboard | ${serverInfo.name} | Valheim Web Link`;
 		data.title = `Dashboard | ${serverInfo.name}`;
 	};
 
-	onMount(() => {
+	onMount(async () => {
 		init();
 
-		const interval = setInterval(() => {
+		const interval = setInterval(async () => {
 			refreshing = true;
-			serverInfo = null;
+			setServerInfo(await serverInfoPromise(serverUrl));
 		}, 5000);
 
 		return () => clearInterval(interval);

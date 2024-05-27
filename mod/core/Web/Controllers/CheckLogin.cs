@@ -1,6 +1,4 @@
-﻿using BepInEx.Bootstrap;
-
-#nullable enable
+﻿#nullable enable
 
 namespace ValheimWebLink.Web.Controllers;
 

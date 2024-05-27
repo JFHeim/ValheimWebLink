@@ -1,5 +1,4 @@
-﻿using System.Reflection;
-using BepInEx;
+﻿using BepInEx;
 using ValheimWebLink.Web.Controllers;
 
 namespace ValheimWebLink.Web;
@@ -13,7 +12,7 @@ public static class WebApiManager
     private static AuthData _authData;
     public static HttpListener Listener => _listener;
 
-    public static readonly IPAddress IP = GetLocalIP();
+    // public static readonly IPAddress IP = GetLocalIP();
 
     public static void ReloadPort()
     {
@@ -30,8 +29,9 @@ public static class WebApiManager
     {
         var port = SettingsManager.instance.httpPort;
         Debug($"Starting Web API server on port {port}...", ConsoleColor.Green);
-        if (IP != null) Debug($"Ip address: {IP}", ConsoleColor.Green);
-        else Debug($"Failed to get ip address", ConsoleColor.Magenta);
+        //TODO: way to get this machine ip address
+        // if (IP != null) Debug($"Ip address: {IP}", ConsoleColor.Green);
+        // else Debug("Failed to get ip address", ConsoleColor.Magenta);
         _listener = new HttpListener();
         _listener.Prefixes.Add($"http://*:{port}/");
 

@@ -1,6 +1,4 @@
-﻿using UnityEngine.Serialization;
-
-namespace ValheimWebLink.Web.Controllers;
+﻿namespace ValheimWebLink.Web.Controllers;
 
 [Controller]
 public class MainRoute : IController
