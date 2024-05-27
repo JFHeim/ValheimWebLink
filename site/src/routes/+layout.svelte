@@ -2,7 +2,8 @@
 	import '../app.postcss';
 	export let data;
 	/** @type {number}*/
-	export let railId;
+	let railId;
+	let loginData;
 
 	// Highlight JS
 	import hljs from 'highlight.js/lib/core';
@@ -40,35 +41,32 @@
 
 	let showAppRail = true;
 	const checkAppRail = () => {
+		const app_rail = document.getElementsByClassName('app-rail')[0];
 		showAppRail = $page.url.pathname.includes('/dashboard') && window.innerWidth >= 620;
-	};
-
-	onMount(() => {
-		console.log(`main layout mounted`);
-		// Set document title
-		if (document.title === $page.url.pathname) document.title = 'Valheim Web Link';
 		const appBar = document.getElementsByClassName('app-bar')[0];
 		// @ts-ignore
 		appBar.style.paddingLeft = '19px';
 		// @ts-ignore
 		appBar.style.maxHeight = '58px';
 		// @ts-ignore
-		document.getElementsByClassName('app-rail')[0].style.maxWidth = '71px';
-
-		checkAppRail();
-	});
+		if (app_rail) app_rail.style.maxWidth = '71px';
+	};
 
 	counter.subscribe((value) => {
 		railId = value.railId;
+		loginData = value.loginData;
 	});
 
-	$: {
+	onMount(() => {
 		counter.set_railId(railId);
-	}
+		checkAppRail();
+	});
 </script>
 
 <Toast />
-<svelte:document title={$page.data.title} />
+<svelte:head>
+	<title>Valheim Web Link</title>
+</svelte:head>
 
 <!-- TODO: checkAppRail on route change, not on click -->
 <svelte:window on:resize={checkAppRail} on:keydown={checkAppRail} on:click={checkAppRail} />
@@ -104,32 +102,36 @@
 				</svelte:fragment>
 				<span> </span>
 			</AppRailTile>
-			<AppRailTile bind:group={railId} name="Info" value={1} title="Server info">
-				<svelte:fragment slot="lead">
-					<div class="centered h-fit w-fit">
-						<Icon src={AiOutlineInfoCircle} size="1.9em" />
-					</div>
-				</svelte:fragment>
-			</AppRailTile>
-			<AppRailTile bind:group={railId} name="World" value={2} title="World info">
-				<svelte:fragment slot="lead">
-					<div class="centered h-fit w-fit">
-						<Icon src={BiWorld} size="1.9em" />
-					</div>
-				</svelte:fragment>
-			</AppRailTile>
-			<AppRailTile bind:group={railId} name="ObjectControl" value={3} title="Object Control">
-				<svelte:fragment slot="lead">
-					<div class="centered h-fit w-fit">
-						<Icon src={BiCube} size="1.9em" />
-					</div>
-				</svelte:fragment>
-			</AppRailTile>
+			{#if loginData}
+				<AppRailTile bind:group={railId} name="Info" value={1} title="Server info">
+					<svelte:fragment slot="lead">
+						<div class="centered h-fit w-fit">
+							<Icon src={AiOutlineInfoCircle} size="1.9em" />
+						</div>
+					</svelte:fragment>
+				</AppRailTile>
+				<AppRailTile bind:group={railId} name="World" value={2} title="World info">
+					<svelte:fragment slot="lead">
+						<div class="centered h-fit w-fit">
+							<Icon src={BiWorld} size="1.9em" />
+						</div>
+					</svelte:fragment>
+				</AppRailTile>
+				<AppRailTile bind:group={railId} name="ObjectControl" value={3} title="Object Control">
+					<svelte:fragment slot="lead">
+						<div class="centered h-fit w-fit">
+							<Icon src={BiCube} size="1.9em" />
+						</div>
+					</svelte:fragment>
+				</AppRailTile>
+			{/if}
 		</AppRail>
 	{/if}
-	<div class="limited-content-screen w-fit-avaliable">
-		<div class="px-4 py-2">
-			<slot />
+	<div style="width: -webkit-fill-available; height: -webkit-fill-available">
+		<div style="width: min(100%, var(--max-content-width, 1376px)); margin: 0 auto">
+			<div class="px-4 py-2">
+				<slot />
+			</div>
 		</div>
 	</div>
 </div>

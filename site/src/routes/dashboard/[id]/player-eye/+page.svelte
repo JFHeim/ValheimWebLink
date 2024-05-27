@@ -1,6 +1,4 @@
 <script>
-	import { browser } from '$app/environment';
-	import { page } from '$app/stores';
 	import { counter } from '$lib/counter.js';
 	import { onMount } from 'svelte';
 
@@ -30,6 +28,8 @@
 			}
 			event_data = JSON.parse(event_data);
 			imageUrl = `data:image/jpg;base64,${event_data.textureData}`;
+			console.log(imageUrl);
+			console.log(event_data.textureData);
 		};
 	});
 </script>

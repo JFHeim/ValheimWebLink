@@ -115,6 +115,7 @@
         <Compile Include="RecordPrefabs.cs"/>
         <Compile Include="Settings.cs"/>
         <Compile Include="Web\Controllers\AvalableCommand.cs"/>
+        <Compile Include="Web\Controllers\CheckLogin.cs" />
         <Compile Include="Web\Controllers\ExecuteCommand.cs"/>
         <Compile Include="Web\Controllers\FindObjects\FindObjects.cs"/>
         <Compile Include="Web\Controllers\FindObjects\FindObjectsResult.cs"/>

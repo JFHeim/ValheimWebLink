@@ -1,32 +1,30 @@
 <script>
+	import { counter } from '$lib/counter';
 	import { onMount } from 'svelte';
 	let fontSize = 'text-5xl'; // Default to desktop size
 	let style = ''; // Default to desktop size
+	let windowWidth = 0; // Default to desktop size
 
+	const updateFontSize = () => {
+		if (windowWidth >= 768) {
+			fontSize = 'text-7xl';
+			style = 'text-right';
+		} else if (windowWidth >= 480) {
+			fontSize = 'text-5xl';
+			style = '';
+		} else {
+			fontSize = 'text-3xl';
+			style = 'text-center';
+		}
+	};
 	onMount(() => {
-		// Adjust font size based on screen width
-		const tabletBreakpoint = 768;
-		const mobileBreakpoint = 480;
-
-		const updateFontSize = () => {
-			if (window.innerWidth >= tabletBreakpoint) {
-				fontSize = 'text-7xl'; // Desktop size
-				style = 'text-right';
-			} else if (window.innerWidth >= mobileBreakpoint) {
-				fontSize = 'text-5xl'; // Tablet size
-				style = '';
-			} else {
-				fontSize = 'text-3xl'; // Mobile size
-				style = 'text-center';
-			}
-		};
-
 		updateFontSize();
-		window.addEventListener('resize', updateFontSize);
-
-		return () => window.removeEventListener('resize', updateFontSize);
 	});
+
+	$: updateFontSize();
 </script>
+
+<svelte:window bind:innerWidth={windowWidth} />
 
 <h1 class={`header font-norse ${fontSize} ${style}`} style="transition: font-size 0.3s;">
 	Welcome to Valheim Web Link

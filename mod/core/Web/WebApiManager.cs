@@ -13,6 +13,8 @@ public static class WebApiManager
     private static AuthData _authData;
     public static HttpListener Listener => _listener;
 
+    public static readonly IPAddress IP = GetLocalIP();
+
     public static void ReloadPort()
     {
         var port = SettingsManager.instance.httpPort;
@@ -27,10 +29,11 @@ public static class WebApiManager
     public static void Init()
     {
         var port = SettingsManager.instance.httpPort;
-        Debug($"Starting Web API server on port {port}...");
+        Debug($"Starting Web API server on port {port}...", ConsoleColor.Green);
+        if (IP != null) Debug($"Ip address: {IP}", ConsoleColor.Green);
+        else Debug($"Failed to get ip address", ConsoleColor.Magenta);
         _listener = new HttpListener();
         _listener.Prefixes.Add($"http://*:{port}/");
-        //TODO: Add https
 
         _cancellationTokenSource = new CancellationTokenSource();
 
@@ -43,25 +46,25 @@ public static class WebApiManager
             if (_authData == null)
             {
                 File.WriteAllText("auth.json", JSON.ToNiceJSON(authData));
-                Debug("Your login and password are default. You MUST edit it before running the server",
-                    ConsoleColor.DarkMagenta);
+                Debug("\nYour login and password are default. You MUST edit it before running the server\n",
+                    ConsoleColor.Red);
             } else
             {
                 if (_authData.login == "root" || _authData.password == "root")
                 {
-                    Debug("Your login and password are default. You MUST edit it before running the server",
-                        ConsoleColor.DarkMagenta);
+                    Debug("\nYour login and password are default. You MUST edit it before running the server\n",
+                        ConsoleColor.Red);
                 }
 
                 if (!_authData.login.IsGood())
                 {
-                    Debug("Your login is in invalid format. Change it. Aborting...", ConsoleColor.DarkMagenta);
+                    Debug("\nYour login is in invalid format. Change it. Aborting...\n", ConsoleColor.Red);
                     Stop();
                 }
 
                 if (!_authData.password.IsGood())
                 {
-                    Debug("Your password is in invalid format. Change it. Aborting...", ConsoleColor.DarkMagenta);
+                    Debug("\nYour password is in invalid format. Change it. Aborting...\n", ConsoleColor.Red);
                     Stop();
                 }
             }
@@ -69,10 +72,10 @@ public static class WebApiManager
         catch (Exception e)
         {
             File.WriteAllText("auth.json", JSON.ToNiceJSON(authData));
-            Debug("Your auth.json file is corrupted. "
+            Debug("\nYour auth.json file is corrupted and will be rewritten with default values.\n"
                   + "You MUST edit it before running the server.\n"
-                  + $"Exeption: {e.GetType().Name} {e.Message}",
-                ConsoleColor.DarkMagenta);
+                  + $"Exeption: {e.GetType().Name} {e.Message}\n\n",
+                ConsoleColor.Red);
 
             _authData = authData;
         }
@@ -100,9 +103,7 @@ public static class WebApiManager
                 var authData = JSON.ToObject<AuthData>(File.ReadAllText("auth.json"));
                 if (authData == null)
                 {
-                    Debug("Your login and password are default or file is corrupted. "
-                          + "You MUST edit it before running the server.",
-                        ConsoleColor.DarkMagenta);
+                    Debug("Looks like your auth file is corrupted. Changes will be ignored", ConsoleColor.Red);
                     return;
                 }
 
@@ -110,10 +111,9 @@ public static class WebApiManager
             }
             catch (Exception exception)
             {
-                Debug("Your login and password are default or file is corrupted. "
-                      + "You MUST edit it before running the server.\n"
+                Debug("Your auth file is corrupted. Changes will be ignored"
                       + $"Exeption: {exception.GetType().Name} {exception.Message}",
-                    ConsoleColor.DarkMagenta);
+                    ConsoleColor.Red);
             }
         };
         fileSystemWatcher.IncludeSubdirectories = true;

@@ -1,40 +1,32 @@
-export const load = ({ fetch }) => {
+import { timeoutFetch } from '$lib/utils';
+
+export const load = () => {
 	const isServerOnline = async ({ ip, port }) => {
 		try {
-			await fetch(`http://${ip}:${port}`);
+			await timeoutFetch(`http://${ip}:${port}`, 500);
 		} catch (error) {
-			const errorMessage = error.message.split(': ')[1];
-			return { isOnline: false, errorMessage: errorMessage };
+			console.error(`Catch error: ${error.message}`);
+			// const errorMessage = error.message.includes(': ')
+			// 	? error.message.split(': ')[1]
+			// 	: error.message;
+			return {
+				isOnline: false
+				// errorMessage: errorMessage
+			};
 		}
 		return { isOnline: true, errorMessage: null };
 	};
 
-	const checkServer = async ({ ip, port }) => {
-		const isOnline = await isServerOnline(ip, port);
-		if (isOnline) {
-			const response = await fetch(`http://${ip}:${port}/serverinfo`);
-			if (response.ok) return { errorMessage: null, data: await response.json() };
-			else return { errorMessage: response.statusText, data: null };
-		} else return { errorMessage: 'Server is offline', data: null };
-	};
-
-	const startServerCheck = ({ ip = 'localhost', port = 8080 }) => {
-		checkServer(ip, port)
-			.then((data) => {
-				if (data === null) {
-					console.log('Server is offline');
-				} else {
-					console.log(data);
-				}
-			})
-			.catch((error) => {
-				console.error(error);
-			});
+	const checkLogin = async ({ login, password }) => {
+		return {
+			error: null,
+			loginData: {}
+		};
 	};
 
 	return {
 		isServerOnline,
-		startServerCheck: startServerCheck,
-		title: 'Dashboard'
+		checkLogin,
+		title: 'Search & Login'
 	};
 };

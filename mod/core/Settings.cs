@@ -1,6 +1,4 @@
 ﻿using BepInEx;
-using UnityEngine.Serialization;
-using ValheimWebLink.Web;
 
 namespace ValheimWebLink;
 
@@ -37,7 +35,7 @@ public static class SettingsManager
     {
         if (!File.Exists(Path.Combine(Paths.GameRootPath, "settings.json")))
         {
-            Debug("This can not happen");
+            Debug("Settings.SetupWatcher.0: Settings file not found. This can not happen", ConsoleColor.Red);
             return;
         }
 
@@ -53,21 +51,32 @@ public static class SettingsManager
                     return;
                 }
 
-                // if (instance.port != fromFile.port)
-                // {
-                //     Debug($"Port changing requires full restart. Old: {instance.port}, new: {fromFile.port}",
-                //         ConsoleColor.Red);
-                // }
+                if (instance.httpPort != fromFile.httpPort)
+                {
+                    Debug($"Port changing requires full restart. Old: {instance.httpPort}, new: {fromFile.httpPort}",
+                        ConsoleColor.Red);
+                }
+
+                if (instance.wsPort != fromFile.wsPort)
+                {
+                    Debug($"Port changing requires full restart. Old: {instance.wsPort}, new: {fromFile.wsPort}",
+                        ConsoleColor.Red);
+                }
+
+
                 //TODO: reload port
-                WebApiManager.ReloadPort();
 
                 instance = fromFile;
             }
             catch (Exception exception)
             {
-                Debug("Your settings file is corrupted.\n"
+                var rewrite = new Settings();
+                File.WriteAllText("settings.json", JSON.ToNiceJSON(rewrite));
+                Debug("Your settings.json file is corrupted and will be rewritten with default values.\n"
                       + $"Exeption: {exception.GetType().Name} {exception.Message}",
                     ConsoleColor.Red);
+
+                instance = rewrite;
             }
         };
         fileSystemWatcher.IncludeSubdirectories = true;
@@ -80,5 +89,5 @@ public static class SettingsManager
 public class Settings
 {
     public int httpPort = 8080;
-    public int wsPort => httpPort + 1;
+    public int wsPort = 8081;
 }
